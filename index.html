@@ -1,0 +1,566 @@
+<!doctype html>
+<html lang="en" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#10283c"><title>The Magic Eye for Image Analysis — English</title><style>
+:root{font-family:Tahoma,'Segoe UI',Arial,sans-serif;color:#183047;background:#eef3f7}*{box-sizing:border-box}body{margin:0}button,input,select,textarea{font:inherit}button{cursor:pointer}button:disabled{opacity:.5;cursor:wait}.wrap{max-width:1320px;margin:auto;padding:18px}.hero{background:linear-gradient(120deg,#10273c,#18636a);color:white;border-radius:20px;padding:28px;display:flex;justify-content:space-between;gap:15px;align-items:center;flex-wrap:wrap}.hero h1{font-size:clamp(25px,4vw,39px);margin:0 0 6px}.hero small{color:#cde5e7}.eye{font-size:54px}.panel{background:#fff;border:1px solid #dce5ec;box-shadow:0 3px 14px #19394a09;border-radius:16px;padding:20px;margin-top:16px}.panel h2{display:flex;align-items:center;gap:10px;color:#153d56;font-size:clamp(19px,2.5vw,25px);border-bottom:2px solid #d7ebec;padding-bottom:12px;margin:0 0 15px}.num{display:inline-flex;align-items:center;justify-content:center;color:#fff;background:#163d59;border-radius:9px;width:40px;height:37px;font-size:17px;flex:none}.hint{color:#62788a;font-size:14px}.row{display:flex;gap:12px;flex-wrap:wrap;align-items:center}.row>*{max-width:100%}.grow{flex:1}.btn{border:0;border-radius:9px;padding:11px 16px;background:#167c83;color:#fff;font-weight:700}.btn.secondary{background:#e5eef3;color:#214359}.btn.danger{background:#9d3c45}.btn:hover{filter:brightness(.94)}select,input[type=number],input[type=text],input[type=password],input[type=url]{border:1px solid #bbcdd9;background:white;border-radius:8px;padding:10px;max-width:100%}label{display:inline-flex;align-items:center;gap:6px}.drop{border:2px dashed #94b3c0;border-radius:13px;background:#f6fafc;text-align:center;padding:28px;cursor:pointer}.drop.over{background:#d9eef0;border-color:#187d83}.preview{position:relative;background:#14232d;border-radius:12px;text-align:center;overflow:hidden;min-height:150px;display:flex;align-items:center;justify-content:center}.preview canvas{max-width:100%;height:auto;display:block;cursor:crosshair}.canvasbox{overflow:auto}.status{padding:9px 13px;border-radius:9px;background:#e8f2f5;color:#12536b}.status.warn{background:#fff2de;color:#85530e}.status.err{background:#ffe4e4;color:#a32933}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px}.stat{background:#f1f6f8;border-radius:12px;padding:13px}.stat b{display:block;font-size:22px;color:#18485e;margin-top:5px;overflow-wrap:anywhere}.bar{display:flex;overflow:hidden;border-radius:10px;height:35px;margin:15px 0}.bar>span{height:100%}.swatch{width:22px;height:22px;display:inline-block;border:1px solid #aab;vertical-align:middle;border-radius:5px}.scroll{overflow:auto}table{border-collapse:collapse;width:100%;min-width:460px}th,td{padding:10px;text-align:right;border-bottom:1px solid #e0e9ee}th{background:#eaf2f5;color:#1d4b60}tr:nth-child(even){background:#fafcfd}.chart{width:100%;max-width:790px;height:220px;border:1px solid #e0eaee;border-radius:8px}.small{font-size:12px;color:#637e8f}.state{float:left;font-size:13px;color:#698293;font-weight:normal}.stack{display:grid;gap:13px}.settings{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:14px}.settings label{display:grid;gap:6px}.checkbox{display:flex!important;align-items:center!important}.imagearea{display:grid;grid-template-columns:minmax(0,2fr) minmax(210px,1fr);gap:14px}.out{white-space:pre-wrap;overflow-wrap:anywhere;line-height:1.9}.anchor{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.anchor a{font-size:13px;text-decoration:none;color:#185b70;background:#edf5f6;padding:7px;border-radius:8px}progress{width:100%;height:13px;accent-color:#167c83}.tag{display:inline-block;background:#e5f2f3;border-radius:7px;padding:4px 9px;margin:3px}.footer{text-align:center;color:#6b8090;padding:28px}canvas{direction:ltr}@media(max-width:760px){.imagearea{grid-template-columns:1fr}.wrap{padding:10px}.panel{padding:14px}.hero{padding:18px}}@media print{body{background:#fff}.hero{color:#000;background:none;border:1px solid #bbb}.noprint,.btn,.drop,.anchor{display:none!important}.panel{break-inside:avoid;box-shadow:none}canvas{max-height:300px}}
+
+.subhead{font-size:18px;color:#164865;margin:15px 0 10px;border-right:5px solid #16828a;padding:4px 11px}.errorline{color:#a52c35;font-weight:600}.notice{background:#fff7e5;color:#764f13;padding:12px;border-radius:10px;margin:10px 0}.pill{border-radius:8px;background:#e3f3f2;color:#11525c;padding:3px 8px}.statuslog{font-size:13px;line-height:1.8}
+
+/* Help dialog / attribution — version 1.2 */
+.hero-tools{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.help-launch{padding:11px 20px;min-height:45px;border:1px solid #a5e5e5;border-radius:11px;color:#fff;background:#ffffff1b;font-weight:800;letter-spacing:.15px}
+.help-launch:hover,.help-launch:focus-visible{background:#ffffff35;outline:2px solid #abe9e4;outline-offset:2px}
+.help-dialog{width:min(940px,calc(100vw - 24px));max-width:none;max-height:min(92dvh,960px);padding:0;margin:auto;border:0;border-radius:20px;color:#193344;background:#fff;box-shadow:0 26px 90px #081b2799;overflow-y:auto;overscroll-behavior:contain}
+.help-dialog::backdrop{background:rgba(8,22,35,.78);backdrop-filter:blur(3px)}
+.help-top{background:linear-gradient(120deg,#10283d,#17656b);color:#fff;position:sticky;top:0;z-index:2;padding:22px 25px;display:flex;justify-content:space-between;align-items:flex-start;gap:15px;box-shadow:0 3px 12px #142b3c32}
+.help-top h2{font-size:clamp(21px,3.4vw,30px);margin:4px 0 5px;color:#fff}
+.help-top p{margin:0;color:#cde6e9;font-size:13px}
+.help-kicker{font-size:12px;color:#94e4df;font-weight:bold}
+.help-close{flex:none;background:#fff;color:#153f50;border:0;border-radius:9px;padding:11px 15px;font-weight:bold}
+.help-close:hover,.help-close:focus-visible{background:#e2f6f4;outline:2px solid #56dfd3;outline-offset:2px}
+.help-content{padding:4px 25px 25px;line-height:1.95}
+.help-content p{margin:7px 0 13px}
+.help-section{border-bottom:1px solid #e1ebef;padding:14px 0 17px}
+.help-section:last-child{border-bottom:none}
+.help-section h3{font-size:20px;color:#124b63;margin:6px 0 10px;border-right:5px solid #1b8588;padding-right:12px}
+.help-section h4{font-size:16px;color:#135970;margin:8px 0 5px}
+.help-content ul,.help-content ol{padding-right:25px;padding-left:10px;margin:8px 0 12px}
+.help-content li{margin:3px 0}
+.help-cols{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:12px 0}
+.help-card{background:#f2f7f9;border:1px solid #deebee;border-radius:12px;padding:13px 16px}
+.help-card h4{margin:0 0 7px}
+.help-card p{margin:0}
+.help-note{padding:11px 14px;border-radius:10px;background:#ecf7f5;border-right:4px solid #16848b;margin:12px 0}
+.help-warning{padding:11px 14px;border-radius:10px;background:#fff5e4;border-right:4px solid #d7a03b;margin:12px 0}
+.help-foot{padding:20px;background:#eaf4f6;text-align:center;border-top:1px solid #d4e6ec;line-height:1.85}
+.help-foot strong{display:block;font-size:18px;color:#174c63}
+.help-foot a,.credit-footer a{color:#136884;font-weight:700;direction:ltr;display:inline-block;unicode-bidi:isolate;overflow-wrap:anywhere}
+.credit-footer{margin:18px auto 6px;padding:23px 14px;border-top:2px solid #c8dcdf;text-align:center;color:#184359;line-height:1.9}
+.credit-footer strong{display:block;font-size:19px}
+.credit-footer .fineprint{display:block;color:#687d89;font-size:12px;margin-top:7px}
+.help-scroll{overflow-x:auto}
+.help-scroll table{min-width:500px}
+.help-scroll th,.help-scroll td{vertical-align:top}
+@media(max-width:620px){.hero-tools{width:100%;justify-content:space-between}.hero-tools .eye{font-size:32px}.help-top{padding:16px;gap:7px}.help-close{padding:9px;font-size:13px}.help-content{padding:4px 15px 14px}.help-cols{grid-template-columns:1fr}.help-dialog{width:calc(100vw - 12px);max-height:96dvh;border-radius:13px}}
+@media print{.help-dialog{display:none!important}.help-launch{display:none!important}}
+
+/* English, left-to-right edition */
+html{direction:ltr}body{direction:ltr}th,td{text-align:left}.state{float:right}.subhead{border-right:0;border-left:5px solid #16828a;padding:4px 11px}.help-section h3{border-right:0;border-left:5px solid #1b8588;padding:0 0 0 12px}.help-note,.help-warning{border-right:0;border-left:4px solid #16848b}.help-warning{border-left-color:#d7a03b}.help-content ul,.help-content ol{padding-left:25px;padding-right:10px}.credit-footer a{direction:ltr}.help-foot a{direction:ltr}.stat b{overflow-wrap:anywhere}.help-dialog{direction:ltr}.drop:focus-visible{outline:3px solid #167c83;outline-offset:3px}
+
+/* Three independent tutorial windows; all main application controls remain English. */
+.guide-buttons{display:flex;align-items:center;flex-wrap:wrap;gap:9px}
+.hero-tools{gap:12px}
+.help-dialog[dir="rtl"]{direction:rtl;text-align:right;font-family:Tahoma,'Segoe UI',sans-serif}
+.help-dialog[dir="rtl"] .help-section h3{border-left:0;border-right:5px solid #1b8588;padding-left:0;padding-right:12px}
+.help-dialog[dir="rtl"] .help-content ol,.help-dialog[dir="rtl"] .help-content ul{padding-left:10px;padding-right:25px}
+.help-dialog[dir="rtl"] .help-note{border-left:0;border-right:4px solid #16848b}
+.help-dialog[dir="rtl"] .help-warning{border-left:0;border-right:4px solid #d7a03b}
+.help-dialog[dir="rtl"] th,.help-dialog[dir="rtl"] td{text-align:right}
+.help-dialog[dir="ltr"] th,.help-dialog[dir="ltr"] td{text-align:left}
+.consent-option{flex:1 1 100%;width:100%;max-width:none!important;align-items:flex-start!important;gap:13px!important;border:1px solid #b9d9df;border-radius:12px;background:#f0f8f9;padding:15px 17px;line-height:1.65;cursor:pointer}
+.consent-option>input{flex:none;width:21px;height:21px;margin:4px 0 0;accent-color:#167c83;cursor:pointer}
+.consent-copy{display:block;min-width:0;flex:1;color:#24485a}
+.consent-copy>strong{display:block;color:#154558;font-size:16px;margin-bottom:7px}
+.consent-copy>span{display:block;margin:7px 0;font-size:14px}
+.consent-copy>span b{color:#14566c}
+.consent-copy>small{display:block;color:#5e7380;margin-top:8px;font-size:12px}
+.consent-explainer{margin:12px 0;padding:14px 17px;background:#f0f8f9;border:1px solid #cfe4e5;border-radius:12px}
+.consent-explainer p{margin:7px 0}
+.consent-explainer strong{color:#12566a}
+@media(max-width:620px){.hero-tools{gap:8px}.guide-buttons{gap:6px}.help-launch{padding:9px 11px;font-size:14px}.consent-option{padding:12px}.consent-copy>strong{font-size:15px}}
+</style></head><body><main class="wrap">
+<header class="hero"><div><h1>◉ The Magic Eye for Image Analysis</h1><div>Magic Eye – Intelligent Image Analyzer (MEIA) · English v1.5</div><small>See the details. Understand what an image reveals.</small></div><div class="hero-tools"><button type="button" id="helpOpen" class="help-launch noprint" aria-haspopup="dialog" aria-controls="helpDialog" title="Program tutorial and operating guide">Tutorial</button><div class="guide-buttons"><button type="button" id="arabicOpen" class="help-launch noprint" aria-haspopup="dialog" aria-controls="arabicDialog" title="دليل الاستخدام بالعربية" lang="ar" dir="rtl">دليل</button><button type="button" id="persianOpen" class="help-launch noprint" aria-haspopup="dialog" aria-controls="persianDialog" title="راهنمای فارسی" lang="fa" dir="rtl">راهنما</button><button type="button" id="finnishOpen" class="help-launch noprint" aria-haspopup="dialog" aria-controls="finnishDialog" title="Suomenkielinen opas" lang="fi">Opas</button></div><div class="eye" aria-hidden="true">◉</div></div></header>
+<nav class="anchor noprint" id="jump" aria-label="Jump to results section"></nav>
+<section class="panel noprint"><h2>Intelligent Engine Settings</h2><div class="row"><label>Operating mode <select id="mode"><option value="auto">Smart automatic</option><option value="offline">Local only (no model downloads)</option><option value="online">Advanced when available</option></select></label><span id="connection" class="status" aria-live="polite">Checking network connection…</span><button class="btn secondary" id="check">Check connection</button><label class="checkbox consent-option" for="consent"><input type="checkbox" id="consent"><span class="consent-copy"><strong>Enable advanced AI image analysis — I agree to download and run AI models locally in my browser.</strong><span><b>✓ With this box checked:</b> the program can download AI models to detect people, cars and other objects, recognize text and numbers (OCR), and classify the image. An internet connection may be needed to download the models the first time; these models use device memory.</span><span><b>✕ Without this box checked:</b> basic functions still work, including color analysis and percentages, RGB distribution, brightness, contrast, sharpness and image dimensions. AI features that require model downloads will not run.</span><small>Checking this box gives permission; it does not guarantee a successful download or recognition. For new model downloads, choose Smart automatic or Advanced when available rather than Local only.</small></span></label></div><p class="hint">Pixel, color, and image-quality calculations always run on your device. OCR, object detection, and image classification also run in your browser, but their models generally need to be downloaded first. This version does not upload your image to an analysis server. Model availability offline depends on the browser cache; if a model cannot load, its actual error will be displayed instead of a fabricated result.</p><div class="settings"><label>Number of dominant colors <input id="clusters" type="number" min="2" max="20" value="8"></label><label>Image analysis size (longest side) <select id="res"><option value="700">700 — Fast</option><option selected value="1200">1200 — Balanced</option><option value="2200">2200 — More detailed, slower</option></select></label><label>OCR languages <select id="langs"><option value="ara+fas+eng+fin">Arabic + Persian + English + Finnish</option><option value="ara+eng+fin">Arabic + English + Finnish</option><option value="ara+fas">Arabic + Persian</option><option value="fas+eng">Persian + English</option><option value="fas">Persian</option><option value="ara+eng">Arabic + English</option><option value="eng">English</option><option value="ara">Arabic</option><option value="fin">Finnish</option><option value="fas+ara+eng">Persian + Arabic + English</option></select></label></div></section>
+<section class="panel"><h2><span class="num">00</span> Upload and Preview Image</h2><div class="drop noprint" id="drop" role="button" tabindex="0" aria-label="Choose image file">🖼️ <b>Click to choose an image, or drag and drop an image here</b><p class="hint">PNG / JPEG / WebP / GIF / BMP and other browser-supported image formats</p><input id="file" type="file" accept="image/*" hidden></div><div class="imagearea" style="margin-top:15px"><div class="preview canvasbox"><canvas id="preview" width="600" height="190" aria-label="Uploaded image preview with optional object bounding boxes"></canvas></div><aside class="stat"><b style="font-size:17px">Analysis Status</b><p id="message" class="hint" aria-live="polite">Upload an image to begin.</p><progress id="progress" max="100" value="0"></progress><div class="row noprint" style="margin-top:15px"><button id="analyze" class="btn" disabled>▶ Analyze Entire Image (Colors + OCR + AI)</button><button id="reset" class="btn secondary">Clear</button></div><p class="small">Drag over the preview to select a region for a color-only analysis. Double-click to clear the selection.</p><button class="btn secondary noprint" id="area" disabled>Analyze Selected Region</button><p class="small" id="selection"></p><label class="checkbox noprint"><input type="checkbox" id="showboxes" checked> Show detected object bounding boxes</label></aside></div></section>
+<section id="colors" class="panel"><h2><span class="num">01</span> Color Analysis and Percentages <span class="state" id="s-colors">Waiting for image</span></h2><p class="hint">Color shares are estimated by clustering sampled pixels; percentages sum to approximately 100% (rounding may apply).</p><div id="colorbar" class="bar"></div><div id="colorsTable" class="scroll">No results yet.</div></section>
+<section id="spectrum" class="panel"><h2><span class="num">02</span> Digital RGB Color Distribution <span class="state" id="s-spectrum">Waiting for image</span></h2><canvas id="hist" class="chart" width="790" height="220"></canvas><p class="hint">These are histograms of digital RGB channel values, not a physical spectrum of light wavelengths. Results depend on lighting, camera processing, and color profile.</p></section>
+<section id="text" class="panel"><h2><span class="num">03</span> Recognized Text and Words <span class="state" id="s-text">Not analyzed yet</span></h2><p class="hint">Tesseract.js OCR supports Arabic, Persian, English, and Finnish. Try a clearer image, higher resolution, or fewer selected languages if text is small. If model downloads fail, try running the program via localhost.</p><div class="row noprint"><button id="ocr" class="btn secondary" disabled>🔎 Read Text (OCR)</button><button id="copytext" class="btn secondary" disabled>Copy Recognized Text</button></div><div class="scroll" id="ocrTable">Text recognition has not been run.</div></section>
+<section id="numbers" class="panel"><h2><span class="num">04</span> Numbers and Languages <span class="state" id="s-numbers">Waiting for OCR</span></h2><div id="numbersOut" class="out">Extracted numbers and possible languages appear after OCR.</div></section>
+<section id="people" class="panel"><h2><span class="num">05</span> People in the Image <span class="state" id="s-people">Waiting for AI model</span></h2><p class="hint">The model may detect people and estimate a count from bounding boxes; it does not identify individuals or reliably infer gender or age from appearance.</p><div id="peopleOut" class="out">Requires the optional AI model.</div></section>
+<section id="objects" class="panel"><h2><span class="num">06</span> Detected Objects <span class="state" id="s-objects">Waiting for AI model</span></h2><div class="row noprint"><button id="detect" class="btn secondary" disabled>🧠 Detect Objects and Classify Image</button><label>Confidence threshold <select id="threshold"><option value="0.25">25% — Broader results</option><option selected value="0.35">35% — Balanced</option><option value="0.50">50% — More selective</option><option value="0.70">70% — Strict</option></select></label></div><div id="objectsOut" class="scroll">Allow model downloads and connect to the internet to enable detection.</div><p class="hint">COCO-SSD detects a limited set of object categories; MobileNet classifies among ImageNet categories. These are probabilistic models, not complete visual understanding, and can miss or mislabel objects.</p></section>
+<section id="description" class="panel"><h2><span class="num">07</span> Image Description <span class="state" id="s-description">Waiting for detection</span></h2><h3 class="subhead">Overall image classification (MobileNet)</h3><div class="scroll" id="classOut">Waiting for classification.</div><h3 class="subhead">Summary from detection and classification</h3><div id="descOut" class="out">A brief description will be generated from detected classes. It is not a free-form vision-language interpretation or proof of what the image contains.</div></section>
+<section id="geometry" class="panel"><h2><span class="num">08</span> Geometric Analysis <span class="state" id="s-geometry">Waiting for image</span></h2><div id="geometryOut"></div><p class="hint">Measurements are in pixels unless a known reference scale is available. An ordinary image alone does not establish real-world dimensions.</p></section>
+<section id="quality" class="panel"><h2><span class="num">09</span> Image Quality Indicators <span class="state" id="s-quality">Waiting for image</span></h2><div id="qualityOut" class="grid"></div><p class="hint">Brightness, contrast, and sharpness indicators are descriptive estimates, not conclusive image-quality or noise measurements.</p></section>
+<section id="metadata" class="panel"><h2><span class="num">10</span> Image File Information <span class="state" id="s-metadata">Waiting for image</span></h2><div id="metaOut" class="scroll"></div></section>
+<section id="report" class="panel"><h2><span class="num">11</span> Final Report <span class="state">Summary and Export</span></h2><div class="row noprint"><button class="btn" id="print">🖨️ Print / Save as PDF</button><button class="btn secondary" id="json">⬇ Export JSON</button><button class="btn secondary" id="csv">⬇ Colors CSV</button><button class="btn secondary" id="copy">Copy Report</button></div><div id="reportOut" class="out">A summary will appear after image analysis.</div></section>
+<footer class="credit-footer"><strong>Designed by Jalal Albadri</strong><div>Contact: <a href="mailto:jalal.al.badri26@gmail.com">jalal.al.badri26@gmail.com</a></div><span class="fineprint">The Magic Eye for Image Analysis — Local calculations with optional AI models. Estimates should be checked before important decisions.</span></footer></main>
+<dialog id="helpDialog" class="help-dialog noprint" aria-labelledby="helpTitle" aria-describedby="helpIntro">
+  <header class="help-top"><div><span class="help-kicker">Tutorial · Capabilities · Practical Applications</span><h2 id="helpTitle">Tutorial — The Magic Eye for Image Analysis</h2><p>Magic Eye – Intelligent Image Analyzer · English v1.5</p></div><button type="button" id="helpClose" class="help-close" aria-label="Close tutorial window">✕ Close</button></header>
+  <div class="help-content">
+    <section class="help-section"><h3>1. What Is the Magic Eye, and What Can It Do?</h3>
+      <p id="helpIntro"><strong>The Magic Eye for Image Analysis</strong> is an HTML and JavaScript image-analysis program for modern computer and mobile browsers. You upload an image and receive measurable color data, charts, recognized text and numbers, and possible object detections from optional browser-based AI models.</p>
+      <p>The program combines <strong>direct pixel calculations</strong> with <strong>optional machine-learning models</strong>. Every result appears under a clearly labeled heading on one continuous page. You can copy, export, or print the results.</p>
+      <div class="help-cols">
+        <div class="help-card"><h4>🎨 Colors and Image Metrics</h4><p>Shows dominant colors, approximate names, HEX codes, proportions, RGB histograms, brightness, contrast, and a sharpness indicator.</p></div>
+        <div class="help-card"><h4>🔤 Text and Numbers</h4><p>OCR supports Arabic, Persian, English, and Finnish according to your selected language models. Recognition may contain errors.</p></div>
+        <div class="help-card"><h4>🚗 Objects and People</h4><p>COCO-SSD can identify certain categories such as people, vehicles, and animals and show bounding boxes and confidence estimates.</p></div>
+        <div class="help-card"><h4>🧠 Classification and Summary</h4><p>MobileNet predicts possible image categories. The program combines these with object detection to produce a basic summary—not a comprehensive human-level description.</p></div>
+      </div>
+    </section>
+    <section class="help-section"><h3>2. Step-by-Step Instructions</h3><ol>
+        <li>Open the HTML file in a current <strong>Chrome or Edge</strong> browser.</li>
+        <li>Choose <strong>Smart automatic</strong>, <strong>Local only</strong>, or <strong>Advanced when available</strong> from Operating mode.</li>
+        <li>To enable OCR and object detection, check the <strong>consent box</strong> for model downloads and local execution. First-time downloads may need significant bandwidth, memory, and time.</li>
+        <li>Select the number of colors, analysis size, and OCR languages. Selecting only necessary languages often improves recognition speed and accuracy.</li>
+        <li>Choose or drag in a photo, then press <strong>Analyze Entire Image</strong>.</li>
+        <li>Scroll through the results: colors, RGB histogram, text, numbers, people, objects, description, geometry, quality, file information, and report.</li>
+        <li>To analyze the colors in a smaller region, drag on the preview and press <strong>Analyze Selected Region</strong>. Double-click the preview to cancel the selection.</li>
+        <li>Use <strong>Copy, JSON, CSV, or Print / Save as PDF</strong> to retain the results. Verify important recognition results against the original image.</li>
+      </ol><div class="consent-explainer"><p><strong>✓ When the AI consent checkbox is enabled:</strong> The program can download and run AI models in your browser to detect people, cars and other objects, read text and numbers using OCR, and classify images. Model downloading requires an available connection when the files are not already cached.</p><p><strong>✕ When the checkbox is not enabled:</strong> Basic features still work, such as color analysis and color percentages, brightness, contrast, sharpness, RGB information and image dimensions. AI features that need the downloaded models will not run.</p><p><strong>Remember:</strong> Permission does not guarantee that downloading or recognition will succeed. The Local only mode prevents new model downloads even if consent is enabled.</p></div><div class="help-note"><strong>Note:</strong> Failure to download one AI model does not prevent local color analysis. Each section displays its own result or a meaningful error.</div>
+    </section>
+    <section class="help-section"><h3>3. Features With and Without an Internet Connection</h3>
+      <div class="help-scroll"><table><thead><tr><th>Feature</th><th>Offline</th><th>Online</th></tr></thead><tbody>
+        <tr><td>Upload and inspect an image</td><td>Works locally after opening the program</td><td>Works locally</td></tr>
+        <tr><td>Color percentages, RGB, quality, image data</td><td>Works without an external service</td><td>Runs without uploading the image</td></tr>
+        <tr><td>Arabic, Persian, English, and Finnish OCR</td><td>May work if libraries and language data are already cached</td><td>Can download required OCR resources and run them in the browser</td></tr>
+        <tr><td>People and object detection</td><td>Depends on previously cached model files; not guaranteed</td><td>Can download and run COCO-SSD locally</td></tr>
+        <tr><td>Image classification and basic description</td><td>Depends on cached MobileNet resources; not guaranteed</td><td>Can download and run MobileNet</td></tr>
+        <tr><td>Export, copy, and printing</td><td>Browser-dependent local functions</td><td>The same functions are available</td></tr>
+      </tbody></table></div>
+      <div class="help-warning"><strong>Important:</strong> This version does <strong>not</strong> connect to a cloud-based vision-language model and does not submit photos to an external analysis API. Internet access mainly enables downloading models that execute inside your browser. Reusing models while offline depends on the browser's cache and is not guaranteed merely because they worked once.</div>
+    </section>
+    <section class="help-section"><h3>4. What Does Image Analysis Mean?</h3>
+      <p>A digital image is a grid of pixels containing color values. <strong>Numerical image analysis</strong> calculates properties that can be measured from these values. <strong>AI image analysis</strong> predicts what patterns may represent, such as letters, numbers, vehicles, or people.</p>
+      <ul><li><strong>Color percentage:</strong> The fraction of sampled pixels assigned to a color group, multiplied by 100. Color clustering is approximate and depends on your settings.</li>
+      <li><strong>Digital RGB distribution:</strong> The frequency of red, green, and blue channel values, not the physical spectrum of light wavelengths.</li>
+      <li><strong>OCR:</strong> Extracting possible letters and numbers from an image; recognition and language identification are not always correct.</li>
+      <li><strong>Object detection:</strong> Predicting an object's class, bounding rectangle, and possible count. Crowding, shadows, and poor lighting can affect results.</li>
+      <li><strong>Model confidence:</strong> A prediction score, not a guarantee that a detection is true.</li>
+      <li><strong>Geometry:</strong> Image dimensions and aspect ratio in pixels. Real-world dimensions require a known scale or calibrated setup.</li></ul>
+    </section>
+    <section class="help-section"><h3>5. Reading Vehicle License Plates — A Practical Application</h3>
+      <p>The Magic Eye concept can be extended to <strong>Automatic Number Plate Recognition (ANPR / ALPR)</strong>. A dedicated system would capture an image from a camera, detect a vehicle and the plate region, correct perspective and lighting, and use OCR to recognize letters and numbers for review.</p>
+      <ol><li>Capture a sufficiently clear picture of the vehicle and its plate.</li><li>Locate and crop the plate using a specialized detector or manual selection.</li><li>Improve the crop and apply OCR with appropriate Arabic, Persian, or Latin recognition models.</li><li>Validate the result against the country's plate format; store or query results only where lawfully authorized.</li></ol>
+      <div class="help-warning"><strong>Current limitations:</strong> OCR may read plate characters that are clearly visible in a manually uploaded image. However, this version <strong>does not have a specialized license-plate detector or continuous ANPR system</strong>, does not identify vehicle owners, and is not connected to a vehicle database. Those functions require additional development, testing, and privacy safeguards.</div>
+    </section>
+    <section class="help-section"><h3>6. Connecting the Magic Eye to a Camera</h3>
+      <p>A future version could include a permission-based <strong>Start Camera</strong> control to capture images or process video frames at intervals. Possible applications include:</p>
+      <ul><li><strong>Object counting:</strong> Counting visible boxes, packages, vehicles, or people within a defined area.</li>
+      <li><strong>Industry:</strong> Monitoring conveyor belts, counting production items, and preliminary defect detection using application-specific trained models.</li>
+      <li><strong>Warehouses:</strong> Reading labels or serial numbers and checking visible stock arrangements.</li>
+      <li><strong>Traffic studies:</strong> Aggregated vehicle counts and direction trends, avoiding unnecessary collection of identifying information.</li>
+      <li><strong>Documents and books:</strong> Converting photographed pages into searchable text.</li>
+      <li><strong>Teaching and research:</strong> Comparing colors and image properties across controlled image sets.</li></ul>
+      <div class="help-note"><strong>Planned, not implemented:</strong> Live camera video, cross-frame tracking, real-time license-plate recognition, database integration, and automated alerts. This version analyzes images uploaded manually, not live video feeds.</div>
+    </section>
+    <section class="help-section"><h3>7. Accuracy, Privacy, and Better Results</h3>
+      <ul><li>Use sharp, well-lit images. Small, distant, or blurry text and plates are harder to read.</li>
+      <li>Select only relevant OCR languages. Arabic and Persian sometimes share words and glyphs, so language detection may remain uncertain.</li>
+      <li>A missing detection does not prove that an object is absent; models recognize limited categories and can fail on difficult scenes.</li>
+      <li>The program does not identify people or infer their gender from appearance. Do not use the model alone for high-stakes security or legal decisions.</li>
+      <li>Consent allows local download and execution of the required AI resources. This version processes uploaded image pixels in the browser; any future external upload capability would need separate, explicit consent.</li>
+      <li>Performance varies with device memory, network quality, and image dimensions. Model caching is browser-dependent.</li></ul>
+      <p>For CCTV or license-plate projects, check local privacy, retention, and surveillance rules before recording or processing personal information.</p>
+    </section>
+    <section class="help-section"><h3>8. Future Development Opportunities</h3>
+      <p>Possible upgrades include live camera capture, image segmentation at the pixel level, specialized vehicle-plate recognition, barcode and QR scanning, separate color analysis of individual objects, image-to-image comparison, diagram interpretation, model selection by task, and richer engineering reports.</p>
+      <p>Test every new capability on labeled reference images before deploying it in industrial, traffic, or safety-related applications.</p>
+    </section>
+  </div>
+  <footer class="help-foot"><strong>Designed by Jalal Albadri</strong><div>Contact: <a href="mailto:jalal.al.badri26@gmail.com">jalal.al.badri26@gmail.com</a></div></footer>
+</dialog>
+
+<dialog id="arabicDialog" class="help-dialog noprint" lang="ar" dir="rtl" aria-labelledby="arabicTitle" aria-describedby="arabicIntro">
+<header class="help-top"><div><span class="help-kicker">دليل الاستخدام · الإمكانات · التطبيقات العملية</span><h2 id="arabicTitle">دليل — العين السحرية لتحليل الصور</h2><p>Magic Eye – Intelligent Image Analyzer · الإصدار 1.5</p></div><button type="button" id="arabicClose" class="help-close" aria-label="إغلاق نافذة الدليل">✕ إغلاق</button></header>
+<div class="help-content">
+<section class="help-section"><h3>١. ما العين السحرية، وماذا تستطيع أن تفعل؟</h3><p id="arabicIntro"><strong>العين السحرية لتحليل الصور</strong> برنامج مكتوب بلُغتَي HTML وJavaScript يعمل في متصفحات الحاسوب والهاتف الحديثة. ترفع صورة فيعرض البرنامج بيانات قابلة للقياس عن الألوان، والرسوم البيانية، والنصوص والأرقام التي يمكن التعرف عليها، والأشياء التي قد تكشفها نماذج الذكاء الاصطناعي الاختيارية العاملة في المتصفح.</p><p>يجمع البرنامج بين <strong>الحساب المباشر لقيم البكسلات</strong> و<strong>نماذج التعلم الآلي الاختيارية</strong>. تظهر جميع النتائج في صفحة متصلة بعناوين واضحة، ويمكن نسخها أو تصديرها أو طباعتها.</p><div class="help-cols"><div class="help-card"><h4>🎨 الألوان وخصائص الصور</h4><p>يحدد الألوان السائدة وأسماءها التقريبية ورموز HEX ونسبها، ويعرض توزيع RGB والسطوع والتباين ومؤشراً للحدة.</p></div><div class="help-card"><h4>🔤 النصوص والأرقام</h4><p>تدعم تقنية OCR العربية والفارسية والإنجليزية والفنلندية بحسب نماذج اللغات المختارة، وقد تقع أخطاء في التعرف.</p></div><div class="help-card"><h4>🚗 الأشياء والأشخاص</h4><p>يستطيع نموذج COCO-SSD الكشف عن بعض الفئات، مثل الأشخاص والمركبات والحيوانات، مع مربعات التحديد وتقديرات الثقة.</p></div><div class="help-card"><h4>🧠 التصنيف والملخص</h4><p>يتنبأ نموذج MobileNet بالفئات المحتملة للصورة، ويجمع البرنامج ذلك مع كشف الأشياء لإنتاج ملخص أساسي، وليس وصفاً شاملاً بمستوى الفهم البشري.</p></div></div></section>
+<section class="help-section"><h3>٢. خطوات استخدام البرنامج</h3><ol><li>افتح ملف HTML في إصدار حديث من متصفح <strong>Chrome أو Edge</strong>.</li><li>اختر وضع التشغيل: <strong>Smart automatic</strong> (تلقائي ذكي)، أو <strong>Local only</strong> (محلي فقط)، أو <strong>Advanced when available</strong> (متقدم عند التوفر).</li><li>لتفعيل التعرف على النصوص وكشف الأشياء، حدد <strong>مربع الموافقة</strong> على تنزيل نماذج الذكاء الاصطناعي وتشغيلها محلياً. قد يحتاج التنزيل الأول إلى اتصال بالإنترنت وذاكرة ووقت.</li><li>اختر عدد الألوان وحجم التحليل ولغات OCR. غالباً ما يحسن الاقتصار على اللغات اللازمة سرعة التعرف ودقته.</li><li>اختر صورة أو اسحبها إلى البرنامج، ثم اضغط <strong>Analyze Entire Image</strong> لتحليل الصورة كاملة.</li><li>راجع أقسام النتائج المتتابعة: الألوان، وتوزيع RGB، والنصوص، والأرقام، والأشخاص، والأشياء، والوصف، والهندسة، والجودة، ومعلومات الملف، والتقرير.</li><li>لتحليل ألوان جزء من الصورة، اسحب المؤشر فوق المعاينة ثم اضغط <strong>Analyze Selected Region</strong>. النقر المزدوج يلغي التحديد.</li><li>احتفظ بالنتائج باستخدام <strong>Copy أو JSON أو CSV أو Print / Save as PDF</strong>، وتحقق من التعرف المهم بالرجوع للصورة الأصلية.</li></ol><div class="consent-explainer"><p><strong>✓ عند وضع علامة الموافقة:</strong> يستطيع البرنامج تنزيل نماذج الذكاء الاصطناعي وتشغيلها داخل المتصفح لكشف الأشخاص والسيارات والأشياء الأخرى، وقراءة النصوص والأرقام باستخدام OCR، وتصنيف الصور. يحتاج تنزيل الملفات إلى الإنترنت إن لم تكن مخزنة مسبقاً.</p><p><strong>✕ دون وضع علامة الموافقة:</strong> يستمر تحليل الألوان ونسبها، والسطوع، والتباين، والحدة، وتوزيع RGB، وأبعاد الصورة. أما وظائف الذكاء الاصطناعي التي تحتاج إلى النماذج فلا تعمل.</p><p><strong>تنبيه:</strong> الموافقة لا تضمن نجاح التنزيل أو التعرف، كما يمنع وضع Local only تنزيل نماذج جديدة حتى مع وجود الموافقة.</p></div><div class="help-note"><strong>ملاحظة:</strong> فشل تنزيل أحد نماذج الذكاء الاصطناعي لا يمنع تحليل الألوان المحلي؛ ويعرض كل قسم نتيجته أو رسالة الخطأ الخاصة به.</div></section>
+<section class="help-section"><h3>٣. الوظائف بوجود الإنترنت وبدونه</h3><div class="help-scroll"><table><thead><tr><th>الوظيفة</th><th>دون إنترنت</th><th>مع الإنترنت</th></tr></thead><tbody><tr><td>تحميل صورة ومعاينتها</td><td>تعمل محلياً بعد فتح البرنامج</td><td>تعمل محلياً</td></tr><tr><td>نسب الألوان وRGB والجودة وبيانات الصورة</td><td>تعمل من دون خدمة خارجية</td><td>تعمل دون رفع الصورة</td></tr><tr><td>OCR بالعربية والفارسية والإنجليزية والفنلندية</td><td>قد يعمل إذا كانت المكتبات وبيانات اللغات محفوظة في ذاكرة المتصفح المؤقتة</td><td>يمكن تنزيل الموارد المطلوبة وتشغيلها داخل المتصفح</td></tr><tr><td>كشف الأشخاص والأشياء</td><td>يعتمد على توفر ملفات النماذج المخزنة مسبقاً، ولا يُضمن</td><td>يمكن تنزيل COCO-SSD وتشغيله محلياً</td></tr><tr><td>تصنيف الصورة والوصف الأساسي</td><td>يتوقف على تخزين موارد MobileNet مسبقاً، ولا يُضمن</td><td>يمكن تنزيل MobileNet وتشغيله</td></tr><tr><td>التصدير والنسخ والطباعة</td><td>وظائف محلية تعتمد على إمكانات المتصفح</td><td>الوظائف نفسها متوفرة</td></tr></tbody></table></div><div class="help-warning"><strong>مهم:</strong> لا تتصل هذه النسخة <strong>بنموذج سحابي يجمع فهم الصور واللغة</strong>، ولا ترسل الصور إلى واجهة برمجية خارجية لتحليلها. يُستخدم الإنترنت أساساً لتنزيل النماذج التي تعمل داخل المتصفح. والعمل دون اتصال لاحقاً يعتمد على ذاكرة المتصفح المؤقتة ولا يمكن ضمانه.</div></section>
+<section class="help-section"><h3>٤. ما المقصود بتحليل الصور؟</h3><p>تتكون الصورة الرقمية من شبكة بكسلات تحمل قيماً لونية. يحسب <strong>التحليل العددي للصور</strong> خصائص قابلة للقياس، بينما يتنبأ <strong>التحليل بالذكاء الاصطناعي</strong> بما قد تمثله الأنماط، كالحروف أو الأرقام أو المركبات أو الأشخاص.</p><ul><li><strong>نسبة اللون:</strong> حصة البكسلات المأخوذة عيناتها والمصنفة ضمن مجموعة لونية، مضروبة في 100؛ وتجميع الألوان تقريبي ويتأثر بالإعدادات.</li><li><strong>توزيع RGB الرقمي:</strong> تكرار قيم قنوات الأحمر والأخضر والأزرق، وليس الطيف الفيزيائي لأطوال موجات الضوء.</li><li><strong>OCR:</strong> استخراج حروف وأرقام محتملة من الصورة، وقد يخطئ في الحروف أو اللغة.</li><li><strong>كشف الأشياء:</strong> توقع فئة الشيء والمستطيل المحيط به وعدده المحتمل؛ وقد تؤثر الظلال والازدحام والإضاءة الضعيفة في النتيجة.</li><li><strong>درجة الثقة:</strong> درجة تنبؤ من النموذج، وليست ضماناً لصحة الكشف.</li><li><strong>الهندسة:</strong> أبعاد الصورة ونسبة الطول إلى العرض بوحدات البكسل، وتتطلب القياسات الحقيقية مقياساً معروفاً أو معايرة.</li></ul></section>
+<section class="help-section"><h3>٥. قراءة لوحات أرقام السيارات — تطبيق عملي</h3><p>يمكن توسيع فكرة العين السحرية إلى <strong>التعرف الآلي على لوحات المركبات (ANPR / ALPR)</strong>. يلتقط النظام المتخصص صورة من كاميرا، ويحدد المركبة ومكان اللوحة، ويصحح المنظور والإضاءة، ثم يستخدم OCR لقراءة الحروف والأرقام من أجل مراجعتها.</p><ol><li>التقط صورة واضحة بما يكفي للمركبة ولوحتها.</li><li>حدد اللوحة واقتصّها بكاشف متخصص أو اختيار يدوي.</li><li>حسّن المنطقة المقتصة وشغّل OCR الملائم للحروف العربية أو الفارسية أو اللاتينية.</li><li>طابق النتيجة مع صيغة لوحات البلد، ولا تخزن المعلومات أو تبحث عنها إلا ضمن تصريح قانوني.</li></ol><div class="help-warning"><strong>حدود النسخة الحالية:</strong> قد يقرأ OCR الحروف الواضحة في لوحة موجودة في صورة يرفعها المستخدم، لكن هذه النسخة <strong>لا تحتوي على كاشف متخصص للوحات أو نظام ANPR مستمر</strong>، ولا تكشف مالك السيارة، ولا تتصل بقاعدة بيانات المركبات. تتطلب تلك الوظائف تطويراً واختباراً وضمانات للخصوصية.</div></section>
+<section class="help-section"><h3>٦. ربط العين السحرية بالكاميرا</h3><p>يمكن في إصدار مستقبلي إضافة زر <strong>Start Camera</strong> يعمل بإذن المستخدم لالتقاط الصور أو تحليل إطارات الفيديو على فترات. ومن التطبيقات المحتملة:</p><ul><li><strong>عدّ الأشياء:</strong> عدّ الصناديق والطرود والمركبات أو الأشخاص الظاهرين في منطقة محددة.</li><li><strong>الصناعة:</strong> مراقبة سيور النقل وعدّ المنتجات والكشف الأولي عن العيوب باستخدام نماذج متخصصة ومدرّبة.</li><li><strong>المخازن:</strong> قراءة الملصقات والأرقام التسلسلية وفحص ترتيب المخزون الظاهر.</li><li><strong>دراسات المرور:</strong> إحصاء المركبات واتجاهات حركتها بصورة إجمالية دون جمع بيانات تعريفية غير ضرورية.</li><li><strong>الوثائق والكتب:</strong> تحويل صور الصفحات إلى نصوص قابلة للبحث.</li><li><strong>التعليم والبحث:</strong> مقارنة الألوان وخصائص الصور في مجموعات صور خاضعة للضبط.</li></ul><div class="help-note"><strong>أفكار مستقبلية، وليست وظائف موجودة:</strong> الفيديو الحي، وتتبع الأشياء بين الإطارات، وقراءة اللوحات فورياً، والاتصال بقواعد البيانات، والتنبيهات التلقائية. تحلل النسخة الحالية صوراً يرفعها المستخدم يدوياً ولا تحلل بثاً مباشراً.</div></section>
+<section class="help-section"><h3>٧. الدقة والخصوصية وتحسين النتائج</h3><ul><li>استخدم صوراً واضحة وجيدة الإضاءة؛ تصعب قراءة النصوص واللوحات الصغيرة أو البعيدة أو الضبابية.</li><li>اختر لغات OCR المطلوبة فقط. تشترك العربية والفارسية في حروف وكلمات، لذلك قد يبقى تحديد اللغة غير مؤكد.</li><li>عدم اكتشاف شيء لا يثبت غيابه؛ فالنماذج تتعرف على فئات محدودة وقد تخطئ في المشاهد الصعبة.</li><li>لا يحدد البرنامج هويات الأشخاص ولا يستنتج جنسهم من مظهرهم. لا تعتمد على النموذج وحده في قرارات أمنية أو قانونية مهمة.</li><li>تسمح الموافقة بتنزيل موارد الذكاء الاصطناعي اللازمة وتشغيلها محلياً. تعالج النسخة الحالية بكسلات الصورة داخل المتصفح؛ وأي رفع خارجي مستقبلي يتطلب موافقة صريحة مستقلة.</li><li>يعتمد الأداء على ذاكرة الجهاز وجودة الشبكة وأبعاد الصورة، ويتوقف التخزين المؤقت للنماذج على المتصفح.</li></ul><p>في مشاريع المراقبة أو قراءة اللوحات، تحقق من قواعد الخصوصية المحلية ومدد الاحتفاظ بالمعلومات وقوانين المراقبة قبل التسجيل أو معالجة البيانات الشخصية.</p></section>
+<section class="help-section"><h3>٨. فرص التطوير المستقبلي</h3><p>تشمل الإضافات المحتملة التصوير المباشر من الكاميرا، وتقسيم الصور على مستوى البكسلات، والتعرف المتخصص على لوحات السيارات، ومسح الباركود وQR، وتحليل ألوان كل جسم على حدة، ومقارنة الصور، وتفسير الرسومات والمخططات، واختيار النماذج بحسب المهمة، وتقارير هندسية أغنى.</p><p>يجب اختبار كل وظيفة جديدة باستخدام صور مرجعية معروفة قبل استخدامها في التطبيقات الصناعية أو المرورية أو المتعلقة بالسلامة.</p></section>
+</div><footer class="help-foot"><strong>المصمم: جلال البدري</strong><div>البريد الإلكتروني: <a href="mailto:jalal.al.badri26@gmail.com" dir="ltr">jalal.al.badri26@gmail.com</a></div></footer>
+</dialog>
+
+<dialog id="persianDialog" class="help-dialog noprint" lang="fa" dir="rtl" aria-labelledby="persianTitle" aria-describedby="persianIntro">
+  <header class="help-top"><div><span class="help-kicker">راهنمای کاربر · قابلیت‌ها · کاربردهای عملی</span><h2 id="persianTitle">راهنما — چشم جادویی برای تحلیل تصاویر</h2><p>Magic Eye – Intelligent Image Analyzer · نسخهٔ ۱٫۵</p></div><button type="button" id="persianClose" class="help-close" aria-label="بستن پنجرهٔ راهنما">✕ بستن</button></header>
+  <div class="help-content">
+    <section class="help-section"><h3>۱. چشم جادویی چیست و چه کارهایی انجام می‌دهد؟</h3>
+      <p id="persianIntro"><strong>چشم جادویی برای تحلیل تصاویر</strong> برنامه‌ای مبتنی بر HTML و JavaScript برای مرورگرهای جدید رایانه و تلفن همراه است. شما تصویری بارگذاری می‌کنید و برنامه داده‌های قابل‌اندازه‌گیری رنگ، نمودارها، متن و اعداد شناسایی‌شده و اشیای احتمالیِ شناسایی‌شده توسط مدل‌های اختیاری هوش مصنوعی را نمایش می‌دهد.</p>
+      <p>این برنامه <strong>محاسبات مستقیم روی پیکسل‌ها</strong> را با <strong>مدل‌های اختیاری یادگیری ماشین</strong> ترکیب می‌کند. تمام نتایج در یک صفحهٔ پیوسته با عنوان‌های مشخص نمایش داده می‌شوند و می‌توانید آن‌ها را کپی، صادر یا چاپ کنید.</p>
+      <div class="help-cols"><div class="help-card"><h4>🎨 رنگ‌ها و معیارهای تصویر</h4><p>رنگ‌های غالب، نام‌های تقریبی رنگ، کدهای HEX، درصد رنگ‌ها، هیستوگرام RGB، روشنایی، کنتراست و شاخص وضوح را نشان می‌دهد.</p></div>
+      <div class="help-card"><h4>🔤 متن و اعداد</h4><p>تشخیص نویسه‌ها (OCR) با توجه به مدل‌های زبانی انتخاب‌شده از عربی، فارسی، انگلیسی و فنلاندی پشتیبانی می‌کند. تشخیص ممکن است خطا داشته باشد.</p></div>
+      <div class="help-card"><h4>🚗 اشیا و افراد</h4><p>مدل COCO-SSD می‌تواند بعضی دسته‌ها مانند انسان، خودرو و حیوان را شناسایی کرده و کادر مکان و امتیاز اطمینان آن‌ها را نمایش دهد.</p></div>
+      <div class="help-card"><h4>🧠 طبقه‌بندی و خلاصه</h4><p>مدل MobileNet دسته‌های احتمالی تصویر را پیش‌بینی می‌کند. برنامه نتیجهٔ آن را با تشخیص اشیا ترکیب می‌کند و توضیحی ساده می‌سازد؛ نه توصیفی کامل در سطح درک انسان.</p></div></div>
+    </section>
+    <section class="help-section"><h3>۲. راهنمای گام‌به‌گام استفاده</h3><ol>
+      <li>فایل HTML را در نسخه‌ای جدید از مرورگر <strong>Chrome یا Edge</strong> باز کنید.</li>
+      <li>در بخش حالت اجرا، یکی از گزینه‌های <strong>Smart automatic (خودکار هوشمند)</strong>، <strong>Local only (فقط محلی)</strong> یا <strong>Advanced when available (پیشرفته در صورت امکان)</strong> را انتخاب کنید.</li>
+      <li>برای فعال‌سازی OCR و تشخیص اشیا، <strong>گزینهٔ رضایت</strong> برای دریافت مدل‌ها و اجرای محلی آن‌ها را علامت بزنید. دانلود اولیه ممکن است به اینترنت، حافظه و زمان قابل‌توجهی نیاز داشته باشد.</li>
+      <li>تعداد رنگ‌ها، اندازهٔ پردازش و زبان‌های OCR را تعیین کنید. انتخاب زبان‌های موردنیاز معمولاً سرعت و دقت را بهتر می‌کند.</li>
+      <li>تصویری انتخاب کنید یا آن را به داخل برنامه بکشید و روی <strong>Analyze Entire Image (تحلیل تمام تصویر)</strong> کلیک کنید.</li>
+      <li>نتایج رنگ‌ها، هیستوگرام RGB، متن، اعداد، افراد، اشیا، توضیح، هندسه، کیفیت، مشخصات فایل و گزارش را در همان صفحه بررسی کنید.</li>
+      <li>برای تحلیل رنگ‌های یک ناحیه، روی پیش‌نمایش بکشید و <strong>Analyze Selected Region (تحلیل ناحیهٔ انتخاب‌شده)</strong> را بزنید. با دوبار کلیک، انتخاب پاک می‌شود.</li>
+      <li>برای ذخیرهٔ نتایج از <strong>Copy، JSON، CSV یا Print / Save as PDF</strong> استفاده کنید. نتایج مهم را با تصویر اصلی مطابقت دهید.</li>
+      </ol><div class="consent-explainer"><p><strong>✓ با فعال‌کردن علامت تأیید هوش مصنوعی:</strong> برنامه می‌تواند مدل‌های هوش مصنوعی را دانلود و در مرورگر اجرا کند تا افراد، خودروها و اشیای دیگر را شناسایی کند، نوشته‌ها و اعداد را با OCR بخواند و موضوع تصویر را طبقه‌بندی کند. اگر مدل‌ها از پیش ذخیره نشده باشند، برای دانلود به اینترنت نیاز است.</p><p><strong>✕ بدون فعال‌کردن این علامت:</strong> قابلیت‌های پایه مانند تحلیل رنگ‌ها و درصد آن‌ها، روشنایی، کنتراست، وضوح تصویر، اطلاعات RGB و ابعاد تصویر همچنان کار می‌کنند؛ اما قابلیت‌های هوش مصنوعی که به دانلود مدل نیاز دارند، اجرا نمی‌شوند.</p><p><strong>توجه:</strong> فعال‌کردن علامت، موفقیت دانلود یا تشخیص را تضمین نمی‌کند. حالت «فقط محلی» حتی با فعال بودن رضایت، اجازهٔ دانلود مدل جدید را نمی‌دهد.</p></div><div class="help-note"><strong>توجه:</strong> اگر دانلود یک مدل هوش مصنوعی ناموفق شود، تحلیل رنگ محلی همچنان ممکن است. هر بخش نتیجهٔ خود یا پیامی دربارهٔ خطا نشان می‌دهد.</div>
+    </section>
+    <section class="help-section"><h3>۳. امکانات با اینترنت و بدون اینترنت</h3>
+      <div class="help-scroll"><table><thead><tr><th>قابلیت</th><th>بدون اینترنت</th><th>با اینترنت</th></tr></thead><tbody>
+      <tr><td>بارگذاری و نمایش تصویر</td><td>پس از باز شدن برنامه به‌صورت محلی کار می‌کند</td><td>به‌صورت محلی کار می‌کند</td></tr>
+      <tr><td>درصد رنگ‌ها، RGB، کیفیت و اطلاعات تصویر</td><td>به سرویس خارجی نیاز ندارد</td><td>بدون آپلود تصویر اجرا می‌شود</td></tr>
+      <tr><td>OCR عربی، فارسی، انگلیسی و فنلاندی</td><td>در صورت ذخیره بودن کتابخانه‌ها و داده‌های زبان در حافظهٔ مرورگر، ممکن است کار کند</td><td>منابع لازم را دانلود و در مرورگر اجرا می‌کند</td></tr>
+      <tr><td>تشخیص افراد و اشیا</td><td>به وجود فایل‌های مدل در حافظهٔ مرورگر وابسته است؛ تضمینی نیست</td><td>می‌تواند COCO-SSD را دریافت و محلی اجرا کند</td></tr>
+      <tr><td>طبقه‌بندی و توضیح سادهٔ تصویر</td><td>به ذخیره بودن منابع MobileNet وابسته است؛ تضمینی نیست</td><td>می‌تواند MobileNet را دریافت و اجرا کند</td></tr>
+      <tr><td>خروجی، کپی و چاپ</td><td>بسته به قابلیت‌های مرورگر، محلی انجام می‌شود</td><td>همان امکانات در دسترس‌اند</td></tr>
+      </tbody></table></div>
+      <div class="help-warning"><strong>مهم:</strong> این نسخه <strong>به مدل ابریِ درک تصویر و زبان متصل نیست</strong> و عکس‌ها را به API خارجی برای تحلیل ارسال نمی‌کند. اینترنت عمدتاً برای دانلود مدل‌هایی به کار می‌رود که در مرورگر اجرا می‌شوند. اجرای مجدد آن‌ها در حالت آفلاین به حافظهٔ کش مرورگر بستگی دارد و تضمین‌شده نیست.</div>
+    </section>
+    <section class="help-section"><h3>۴. تحلیل تصویر به چه معناست؟</h3>
+      <p>تصویر دیجیتال شبکه‌ای از پیکسل‌ها با مقادیر رنگی است. <strong>تحلیل عددی تصویر</strong> ویژگی‌های قابل‌اندازه‌گیری را محاسبه می‌کند. <strong>تحلیل تصویر با هوش مصنوعی</strong> حدس می‌زند که الگوها نشان‌دهندهٔ چه چیزهایی هستند؛ مانند حروف، اعداد، خودروها یا افراد.</p>
+      <ul><li><strong>درصد رنگ:</strong> نسبت تعداد پیکسل‌های نمونه‌برداری‌شده در هر گروه رنگی، ضرب‌در ۱۰۰؛ خوشه‌بندی رنگ تقریبی و وابسته به تنظیمات است.</li>
+      <li><strong>توزیع دیجیتال RGB:</strong> فراوانی مقادیر کانال‌های قرمز، سبز و آبی، نه طیف فیزیکی طول موج نور.</li>
+      <li><strong>OCR:</strong> استخراج حروف و اعداد احتمالی از تصویر؛ تشخیص نویسه‌ها و زبان همیشه درست نیست.</li>
+      <li><strong>تشخیص شیء:</strong> پیش‌بینی نوع شیء، کادر پیرامون آن و شمار احتمالی؛ شلوغی، سایه و نور نامناسب نتیجه را ضعیف می‌کنند.</li>
+      <li><strong>امتیاز اطمینان:</strong> نمرهٔ پیش‌بینی مدل است، نه تضمین درستی نتیجه.</li>
+      <li><strong>هندسه:</strong> عرض، ارتفاع و نسبت ابعاد برحسب پیکسل؛ اندازه‌گیری واقعی به مقیاس مشخص یا دوربین کالیبره‌شده نیاز دارد.</li></ul>
+    </section>
+    <section class="help-section"><h3>۵. خواندن پلاک خودرو — یک کاربرد عملی</h3>
+      <p>مفهوم چشم جادویی را می‌توان به <strong>تشخیص خودکار شمارهٔ پلاک (ANPR / ALPR)</strong> گسترش داد. سامانهٔ اختصاصی باید تصویری از دوربین بگیرد، خودرو و ناحیهٔ پلاک را پیدا کند، پرسپکتیو و نور را اصلاح کند و با OCR حروف و اعداد را برای بررسی بخواند.</p>
+      <ol><li>تصویری واضح و باکیفیت از خودرو و پلاک تهیه کنید.</li><li>پلاک را با آشکارساز اختصاصی یا انتخاب دستی پیدا و برش دهید.</li><li>تصویر برش‌خورده را بهبود دهید و OCR مناسب نویسه‌های عربی، فارسی یا لاتین را اجرا کنید.</li><li>نتیجه را با قالب پلاک کشور تطبیق دهید؛ ذخیره یا جست‌وجوی داده‌ها فقط با مجوز قانونی انجام شود.</li></ol>
+      <div class="help-warning"><strong>محدودیت نسخهٔ فعلی:</strong> OCR ممکن است نویسه‌های واضح پلاک را در عکس بارگذاری‌شده بخواند؛ اما این نسخه <strong>آشکارساز اختصاصی پلاک یا سامانهٔ پیوستهٔ ANPR ندارد</strong>، مالک خودرو را شناسایی نمی‌کند و به پایگاه دادهٔ خودرو متصل نیست. این موارد به توسعه، آزمایش و رعایت حریم خصوصی نیاز دارند.</div>
+    </section>
+    <section class="help-section"><h3>۶. اتصال چشم جادویی به دوربین</h3>
+      <p>در نسخه‌های آینده می‌توان دکمهٔ <strong>Start Camera (شروع دوربین)</strong> را با اجازهٔ کاربر افزود تا عکس بگیرد یا فریم‌های ویدئو را در بازه‌های زمانی پردازش کند. کاربردهای احتمالی:</p>
+      <ul><li><strong>شمارش اشیا:</strong> شمارش جعبه‌ها، بسته‌ها، خودروها یا افراد قابل‌مشاهده در یک ناحیه.</li>
+      <li><strong>صنعت:</strong> پایش نوار نقاله، شمارش محصولات و تشخیص اولیهٔ عیب با مدل‌های آموزش‌دیدهٔ مخصوص کاربرد.</li>
+      <li><strong>انبارها:</strong> خواندن برچسب یا شمارهٔ سریال و بررسی چیدمان موجودی قابل‌مشاهده.</li>
+      <li><strong>مطالعات ترافیک:</strong> شمارش تجمیعی خودروها و بررسی روند جهت حرکت، بدون جمع‌آوری غیرضروری داده‌های هویتی.</li>
+      <li><strong>اسناد و کتاب‌ها:</strong> تبدیل صفحات عکس‌برداری‌شده به متن قابل‌جست‌وجو.</li>
+      <li><strong>آموزش و پژوهش:</strong> مقایسهٔ رنگ‌ها و ویژگی‌های تصویر در مجموعه‌های کنترل‌شده.</li></ul>
+      <div class="help-note"><strong>برنامهٔ آینده، نه ویژگی موجود:</strong> ویدئوی زنده، ردیابی بین فریم‌ها، خواندن لحظه‌ای پلاک، اتصال به پایگاه داده و هشدار خودکار. این نسخه فقط تصاویر بارگذاری‌شده به‌صورت دستی را تحلیل می‌کند، نه ویدئوی زنده.</div>
+    </section>
+    <section class="help-section"><h3>۷. دقت، حریم خصوصی و بهبود نتیجه</h3>
+      <ul><li>از تصاویر واضح و پرنور استفاده کنید؛ خواندن متن یا پلاک کوچک، دور یا تار دشوارتر است.</li>
+      <li>فقط زبان‌های OCR مرتبط را انتخاب کنید. عربی و فارسی برخی واژه‌ها و شکل حروف مشترک دارند و تشخیص زبان می‌تواند نامطمئن باشد.</li>
+      <li>پیدا نشدن یک شیء به معنای نبودن آن نیست؛ مدل‌ها دسته‌های محدودی را می‌شناسند و گاهی خطا می‌کنند.</li>
+      <li>برنامه افراد را شناسایی هویتی نمی‌کند و جنسیت آن‌ها را از ظاهر حدس نمی‌زند. از خروجی به‌تنهایی برای تصمیم‌های امنیتی یا حقوقی مهم استفاده نکنید.</li>
+      <li>رضایت کاربر اجازهٔ دانلود و اجرای محلی منابع هوش مصنوعی است. در این نسخه پیکسل‌های عکس بارگذاری‌شده در مرورگر پردازش می‌شوند؛ هر ویژگیِ آپلود خارجی در آینده به رضایت جداگانه و صریح نیاز دارد.</li>
+      <li>عملکرد به حافظهٔ دستگاه، کیفیت اینترنت و اندازهٔ تصویر وابسته است. ذخیرهٔ کشِ مدل‌ها به مرورگر بستگی دارد.</li></ul>
+      <p>برای دوربین‌های نظارتی یا طرح‌های پلاک‌خوانی، قوانین محلی حریم خصوصی، نگهداری داده‌ها و نظارت تصویری را پیش از ضبط یا پردازش اطلاعات شخصی بررسی کنید.</p>
+    </section>
+    <section class="help-section"><h3>۸. فرصت‌های توسعه در آینده</h3>
+      <p>پیشرفت‌های احتمالی شامل تصویربرداری زنده از دوربین، قطعه‌بندی تصویر در سطح پیکسل، تشخیص اختصاصی پلاک، خواندن بارکد و QR، تحلیل رنگِ هر شیء به‌طور جداگانه، مقایسهٔ دو تصویر، تفسیر نقشه‌ها، انتخاب مدل متناسب با وظیفه و گزارش‌های مهندسی کامل‌تر است.</p>
+      <p>پیش از استفاده از هر قابلیت جدید در صنعت، ترافیک یا کاربردهای ایمنی، آن را با تصاویر مرجعِ دارای برچسب آزمایش کنید.</p>
+    </section>
+  </div>
+  <footer class="help-foot"><strong>طراحی: مهندس جلال بدری</strong><div>ایمیل تماس: <a href="mailto:jalal.al.badri26@gmail.com" dir="ltr">jalal.al.badri26@gmail.com</a></div></footer>
+</dialog>
+
+
+<dialog id="finnishDialog" class="help-dialog noprint" lang="fi" dir="ltr" aria-labelledby="finnishTitle" aria-describedby="finnishIntro">
+  <header class="help-top"><div><span class="help-kicker">Käyttöohje · Ominaisuudet · Käyttökohteet</span><h2 id="finnishTitle">Opas — Taikasilmä-kuva-analyysi</h2><p>Magic Eye – Intelligent Image Analyzer · versio 1.5</p></div><button type="button" id="finnishClose" class="help-close" aria-label="Sulje opas">✕ Sulje</button></header>
+  <div class="help-content">
+    <section class="help-section"><h3>1. Mikä Taikasilmä on ja mitä sillä voi tehdä?</h3>
+      <p id="finnishIntro"><strong>Taikasilmä-kuva-analyysi</strong> on HTML- ja JavaScript-pohjainen ohjelma nykyaikaisille tietokoneen ja puhelimen selaimille. Kun lataat kuvan, ohjelma näyttää mitattavia väritietoja, kaavioita, tunnistettua tekstiä ja numeroita sekä mahdollisia kohdehavaintoja valinnaisten selaimessa toimivien tekoälymallien avulla.</p>
+      <p>Ohjelma yhdistää <strong>pikseleistä tehtävät suorat laskelmat</strong> ja <strong>valinnaiset koneoppimismallit</strong>. Kaikki tulokset näkyvät samalla pitkällä sivulla selkeästi otsikoituina. Tulokset voi kopioida, viedä tiedostoon tai tulostaa.</p>
+      <div class="help-cols"><div class="help-card"><h4>🎨 Värit ja kuvan mittarit</h4><p>Hallitsevat värit, likimääräiset värinimet, HEX-koodit, osuudet, RGB-histogrammit, kirkkaus, kontrasti ja terävyyttä kuvaava mittari.</p></div>
+      <div class="help-card"><h4>🔤 Tekstit ja numerot</h4><p>Tekstintunnistus (OCR) tukee arabiaa, persiaa, englantia ja suomea valittujen kielimallien mukaan. Tunnistuksessa voi olla virheitä.</p></div>
+      <div class="help-card"><h4>🚗 Kohteet ja ihmiset</h4><p>COCO-SSD voi tunnistaa tiettyjä luokkia, kuten ihmisiä, ajoneuvoja ja eläimiä, sekä näyttää rajausruudut ja luottamusarviot.</p></div>
+      <div class="help-card"><h4>🧠 Luokittelu ja yhteenveto</h4><p>MobileNet arvioi kuvan mahdollisia luokkia. Ohjelma yhdistää arviot kohteiden tunnistukseen ja muodostaa lyhyen kuvauksen, joka ei vastaa ihmisen kattavaa tulkintaa.</p></div></div>
+    </section>
+    <section class="help-section"><h3>2. Käyttö vaihe vaiheelta</h3><ol>
+      <li>Avaa HTML-tiedosto ajan tasalla olevassa <strong>Chrome- tai Edge-selaimessa</strong>.</li>
+      <li>Valitse toimintatilaksi <strong>Smart automatic (älykäs automaattinen)</strong>, <strong>Local only (vain paikallinen)</strong> tai <strong>Advanced when available (laajennettu, kun käytettävissä)</strong>.</li>
+      <li>Ota OCR ja kohteiden tunnistus käyttöön valitsemalla <strong>suostumusvalintaruutu</strong> mallien latausta ja paikallista suorittamista varten. Ensimmäinen lataus voi vaatia paljon tiedonsiirtoa, muistia ja aikaa.</li>
+      <li>Valitse värien määrä, analyysin kuvatarkkuus ja OCR-kielet. Vain tarvittavien kielten valinta yleensä parantaa nopeutta ja osumatarkkuutta.</li>
+      <li>Valitse kuva tai vedä se ohjelmaan ja napsauta <strong>Analyze Entire Image (analysoi koko kuva)</strong>.</li>
+      <li>Selaa samalla sivulla näkyviä tuloksia: värit, RGB-histogrammi, tekstit, numerot, ihmiset, kohteet, kuvaus, geometria, laatu, tiedoston tiedot ja raportti.</li>
+      <li>Voit analysoida pienemmän alueen värejä vetämällä hiirellä kuvan esikatselussa ja napsauttamalla <strong>Analyze Selected Region (analysoi valittu alue)</strong>. Kaksoisnapsautus poistaa valinnan.</li>
+      <li>Tallenna tulokset toiminnoilla <strong>Copy, JSON, CSV tai Print / Save as PDF</strong>. Tarkista tärkeät tunnistustulokset alkuperäisestä kuvasta.</li>
+      </ol><div class="consent-explainer"><p><strong>✓ Kun tekoälymallien latauksen suostumusruutu on valittuna:</strong> Ohjelma voi ladata tekoälymalleja ja suorittaa niitä selaimessa. Niiden avulla se voi tunnistaa ihmisiä, autoja ja muita kohteita, lukea tekstejä ja numeroita OCR-tekniikalla sekä luokitella kuvia. Ensimmäinen mallien lataus edellyttää internetyhteyttä, jos niitä ei ole jo välimuistissa.</p><p><strong>✕ Kun ruutua ei ole valittu:</strong> Perustoiminnot, kuten värien analysointi ja prosenttiosuudet, kirkkaus, kontrasti, terävyys, RGB-tiedot ja kuvan mitat, toimivat edelleen. Ladattavia malleja edellyttävät tekoälytoiminnot eivät käynnisty.</p><p><strong>Huomio:</strong> Suostumuksen antaminen ei takaa onnistunutta latausta tai tunnistusta. Local only -tilassa uusia malleja ei ladata, vaikka suostumus olisi annettu.</p></div><div class="help-note"><strong>Huomaa:</strong> Yhden tekoälymallin latausvirhe ei estä paikallista värianalyysiä. Kukin osio näyttää oman tuloksensa tai ymmärrettävän virheilmoituksen.</div>
+    </section>
+    <section class="help-section"><h3>3. Toiminnot ilman internetyhteyttä ja sen kanssa</h3>
+      <div class="help-scroll"><table><thead><tr><th>Ominaisuus</th><th>Ilman internetyhteyttä</th><th>Internet-yhteydellä</th></tr></thead><tbody>
+      <tr><td>Kuvan avaaminen ja tarkastelu</td><td>Toimii paikallisesti ohjelman avaamisen jälkeen</td><td>Toimii paikallisesti</td></tr>
+      <tr><td>Väriosuudet, RGB, laatu ja kuvatiedot</td><td>Ei tarvitse ulkoista palvelua</td><td>Toimii ilman kuvan lähettämistä</td></tr>
+      <tr><td>Arabian-, persian-, englannin- ja suomenkielinen OCR</td><td>Voi toimia, jos kirjastot ja kielitiedot ovat selaimen välimuistissa</td><td>Voi ladata tarvittavat resurssit ja suorittaa tunnistuksen selaimessa</td></tr>
+      <tr><td>Ihmisten ja kohteiden tunnistus</td><td>Riippuu välimuistiin tallennetuista mallitiedostoista; ei taattu</td><td>Voi ladata COCO-SSD-mallin ja suorittaa sen paikallisesti</td></tr>
+      <tr><td>Kuvan luokittelu ja lyhyt kuvaus</td><td>Riippuu MobileNet-resurssien välimuistista; ei taattu</td><td>Voi ladata ja suorittaa MobileNet-mallin</td></tr>
+      <tr><td>Vienti, kopiointi ja tulostus</td><td>Paikalliset toiminnot riippuvat selaimesta</td><td>Samat toiminnot ovat käytettävissä</td></tr>
+      </tbody></table></div>
+      <div class="help-warning"><strong>Tärkeää:</strong> Tämä versio <strong>ei käytä pilvipohjaista kuvaa ymmärtävää kielimallia</strong> eikä lähetä kuvia ulkoiseen analysointirajapintaan. Internet-yhteys mahdollistaa pääasiassa selaimessa ajettavien mallien lataamisen. Mallien käyttö myöhemmin ilman yhteyttä riippuu selaimen välimuistista, eikä ole taattua.</div>
+    </section>
+    <section class="help-section"><h3>4. Mitä kuvan analysointi tarkoittaa?</h3>
+      <p>Digitaalinen kuva koostuu pikseleistä ja niiden väriarvoista. <strong>Numeerinen kuva-analyysi</strong> laskee näistä arvoista mitattavia ominaisuuksia. <strong>Tekoälypohjainen kuva-analyysi</strong> arvioi, mitä kuvion osat voivat esittää, kuten kirjaimia, numeroita, ajoneuvoja tai ihmisiä.</p>
+      <ul><li><strong>Värin prosenttiosuus:</strong> tiettyyn väriryhmään luokiteltujen näytepikselien osuus kerrottuna sadalla. Värien ryhmittely on likimääräistä ja riippuu asetuksista.</li>
+      <li><strong>Digitaalinen RGB-jakauma:</strong> punaisten, vihreiden ja sinisten kanava-arvojen yleisyys, ei valon aallonpituuksien fysikaalinen spektri.</li>
+      <li><strong>OCR:</strong> kuvassa mahdollisesti näkyvien kirjainten ja numeroiden poiminta; merkki- ja kielitunnistus voi erehtyä.</li>
+      <li><strong>Kohteentunnistus:</strong> kohdeluokan, rajausruudun ja mahdollisen lukumäärän arviointi. Tungos, varjot ja heikko valaistus heikentävät tuloksia.</li>
+      <li><strong>Mallin luottamusarvio:</strong> ennusteen pistemäärä, ei tae havainnon oikeellisuudesta.</li>
+      <li><strong>Geometria:</strong> kuvan koko ja kuvasuhde pikseleinä. Todelliset mitat vaativat tunnetun mittakaavan tai kalibroidun järjestelmän.</li></ul>
+    </section>
+    <section class="help-section"><h3>5. Ajoneuvojen rekisterikilpien lukeminen — käytännön sovellus</h3>
+      <p>Taikasilmä-konseptia voidaan laajentaa <strong>automaattiseksi rekisterikilven tunnistukseksi (ANPR / ALPR)</strong>. Erillinen järjestelmä ottaisi kuvan kamerasta, paikantaisi ajoneuvon ja kilven, korjaisi perspektiiviä ja valaistusta sekä tunnistaisi kirjaimet ja numerot OCR:n avulla tarkistusta varten.</p>
+      <ol><li>Ota riittävän tarkka kuva ajoneuvosta ja rekisterikilvestä.</li><li>Paikanna ja rajaa kilpi erityisellä tunnistusmallilla tai käsin.</li><li>Paranna rajattua kuvaa ja käytä arabialaisille, persialaisille tai latinalaisille merkeille sopivaa OCR-mallia.</li><li>Tarkista tulos maan kilpimuodon mukaan. Tallenna tai hae tietoja vain, kun se on laillisesti sallittua.</li></ol>
+      <div class="help-warning"><strong>Nykyversion rajoitukset:</strong> OCR saattaa lukea selvästi erottuvat rekisterikilven merkit käsin ladatusta kuvasta, mutta versiossa <strong>ei ole erillistä kilpitunnistinta eikä jatkuvaa ANPR-järjestelmää</strong>. Se ei tunnista auton omistajaa eikä käytä ajoneuvotietokantaa. Nämä vaativat lisää kehitystyötä, testejä ja tietosuojatoimia.</div>
+    </section>
+    <section class="help-section"><h3>6. Taikasilmän liittäminen kameraan</h3>
+      <p>Tulevassa versiossa voitaisiin lisätä luvanvarainen <strong>Start Camera (käynnistä kamera)</strong> -toiminto kuvien ottamiseen tai videoruutujen käsittelyyn määräajoin. Mahdollisia käyttökohteita ovat:</p>
+      <ul><li><strong>Kohteiden laskenta:</strong> laatikoiden, pakkausten, ajoneuvojen tai ihmisten laskeminen määritetyllä alueella.</li>
+      <li><strong>Teollisuus:</strong> kuljetinhihnojen valvonta, tuotteiden laskeminen ja alustava vikojen havaitseminen tarkoitukseen koulutetuilla malleilla.</li>
+      <li><strong>Varastot:</strong> etikettien tai sarjanumeroiden lukeminen ja näkyvien varastojärjestelyjen tarkistaminen.</li>
+      <li><strong>Liikennetutkimus:</strong> ajoneuvojen koottujen määrien ja kulkusuuntien seuranta ilman tarpeetonta tunnistetietojen keruuta.</li>
+      <li><strong>Asiakirjat ja kirjat:</strong> valokuvattujen sivujen muuntaminen haettavaksi tekstiksi.</li>
+      <li><strong>Opetus ja tutkimus:</strong> värien ja kuvaominaisuuksien vertailu hallituissa kuva-aineistoissa.</li></ul>
+      <div class="help-note"><strong>Suunnitteilla, ei vielä käytössä:</strong> reaaliaikainen kameravideo, kohteiden seuranta ruudusta toiseen, reaaliaikainen kilventunnistus, tietokantayhteys ja automaattiset hälytykset. Nykyversio analysoi käsin ladattuja kuvia, ei live-videota.</div>
+    </section>
+    <section class="help-section"><h3>7. Tarkkuus, tietosuoja ja paremmat tulokset</h3>
+      <ul><li>Käytä teräviä, hyvin valaistuja kuvia. Pienen, kaukana olevan tai epätarkan tekstin ja kilven lukeminen on vaikeampaa.</li>
+      <li>Valitse vain tarvittavat OCR-kielet. Arabiassa ja persiassa on yhteisiä sanoja ja merkkejä, joten kielentunnistus voi jäädä epävarmaksi.</li>
+      <li>Jos kohdetta ei havaita, se ei tarkoita, ettei sitä olisi kuvassa. Mallit tunnistavat vain rajallisia luokkia ja voivat epäonnistua hankalissa tilanteissa.</li>
+      <li>Ohjelma ei tunnista henkilöiden identiteettiä eikä päättele sukupuolta ulkonäöstä. Älä käytä tuloksia yksinään merkittäviin turvallisuus- tai oikeudellisiin päätöksiin.</li>
+      <li>Suostumus koskee tekoälyresurssien lataamista ja paikallista suorittamista. Tässä versiossa ladatun kuvan pikselit käsitellään selaimessa. Mahdollinen tuleva lähetys ulkopuoliseen palveluun edellyttäisi erillistä nimenomaista suostumusta.</li>
+      <li>Suorituskyky riippuu laitteen muistista, verkon laadusta ja kuvan koosta. Mallien välimuisti riippuu selaimesta.</li></ul>
+      <p>Valvontakameroita tai kilventunnistusta varten on ennen henkilötietojen tallentamista tai käsittelyä selvitettävä paikalliset tietosuoja-, säilytys- ja kameravalvontasäännöt.</p>
+    </section>
+    <section class="help-section"><h3>8. Mahdollisia jatkokehityskohteita</h3>
+      <p>Mahdollisia lisäominaisuuksia ovat reaaliaikainen kamerakuva, pikselitason segmentointi, erityinen rekisterikilventunnistus, viivakoodien ja QR-koodien lukeminen, yksittäisten kohteiden värianalyysi, kuvien vertailu, kaavioiden tulkinta, tehtävän mukaan valittavat mallit ja laajemmat tekniset raportit.</p>
+      <p>Testaa jokainen uusi ominaisuus merkityillä vertailukuvilla ennen käyttöönottoa teollisuus-, liikenne- tai turvallisuussovelluksissa.</p>
+    </section>
+  </div>
+  <footer class="help-foot"><strong>Suunnittelu: Jalal Albadri</strong><div>Yhteystiedot: <a href="mailto:jalal.al.badri26@gmail.com">jalal.al.badri26@gmail.com</a></div></footer>
+</dialog>
+
+<script>
+'use strict';const $=id=>document.getElementById(id),data={file:null,img:null,colors:[],hist:null,quality:null,geometry:null,ocr:null,objects:null,description:null,online:false,box:null,sourceCanvas:null};
+const esc=s=>String(s??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));const state=(id,t)=>$('s-'+id).textContent=t;const msg=(t,v=0)=>{$('message').textContent=t;$('progress').value=v};const sleep=()=>new Promise(r=>setTimeout(r,25));
+function tab(head,rows){return '<table><thead><tr>'+head.map(x=>'<th>'+esc(x)+'</th>').join('')+'</tr></thead><tbody>'+rows.map(a=>'<tr>'+a.map(x=>'<td>'+x+'</td>').join('')+'</tr>').join('')+'</tbody></table>'}
+function canvasFromImage(img,max){let w=img.naturalWidth,h=img.naturalHeight,k=Math.min(1,max/Math.max(w,h));let c=document.createElement('canvas');c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));let ctx=c.getContext('2d',{willReadFrequently:true});ctx.drawImage(img,0,0,c.width,c.height);return c}
+function drawPreview(){let c=$('preview');if(!data.img){c.width=600;c.height=190;c.getContext('2d').clearRect(0,0,600,190);return}let src=data.sourceCanvas;c.width=src.width;c.height=src.height;let ctx=c.getContext('2d');ctx.drawImage(src,0,0);if(data.objects&&$('showboxes')?.checked){ctx.font=Math.max(12,Math.round(c.width/75))+'px sans-serif';ctx.textBaseline='top';data.objects.slice(0,70).forEach(z=>{let b=z.box;if(!b)return;let x=b.xmin,y=b.ymin,w=b.xmax-b.xmin,h=b.ymax-b.ymin;ctx.strokeStyle='#04e6cd';ctx.lineWidth=Math.max(2,c.width/450);ctx.strokeRect(x,y,w,h);let t=(clsEnglish[z.label.replaceAll(' ','_')]||z.label)+' '+Math.round(z.score*100)+'%';let tw=ctx.measureText(t).width;ctx.fillStyle='rgba(5,37,49,0.88)';ctx.fillRect(x,Math.max(0,y-22),tw+9,22);ctx.fillStyle='#fff';ctx.fillText(t,x+4,Math.max(0,y-22)+2)})}if(data.box){let b=data.box;ctx.strokeStyle='#ffdc49';ctx.lineWidth=Math.max(2,c.width/400);ctx.setLineDash([12,7]);ctx.strokeRect(b.x,b.y,b.w,b.h);ctx.setLineDash([])}}
+$('drop').onclick=()=>$('file').click();$('drop').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('file').click();}});$('file').onchange=e=>loadFile(e.target.files[0]);for(let event of ['dragenter','dragover'])$('drop').addEventListener(event,e=>{e.preventDefault();$('drop').classList.add('over')});for(let event of ['dragleave','drop'])$('drop').addEventListener(event,e=>{e.preventDefault();$('drop').classList.remove('over')});$('drop').addEventListener('drop',e=>loadFile(e.dataTransfer.files[0]));
+async function loadFile(f){if(!f)return;if(!f.type.startsWith('image/')){msg('The selected file is not a supported image.');return}data.file=f;data.colors=[];data.hist=null;data.quality=null;data.geometry=null;data.ocr=null;data.objects=null;data.description=null;data.classification=null;data.numbers=null;data.box=null;resetAIPanels();resetLocalPanels();let url=URL.createObjectURL(f);try{let im=new Image();im.src=url;await im.decode();data.img=im;data.sourceCanvas=canvasFromImage(im,Number($('res').value));drawPreview();$('analyze').disabled=false;$('area').disabled=true;$('ocr').disabled=false;$('detect').disabled=false;msg('Loaded '+f.name+' — ready for analysis',0);$('metaOut').innerHTML=tab(['Property','Value'],[['File name',esc(f.name)],['File type',esc(f.type)],['Dimensions',im.naturalWidth+' × '+im.naturalHeight],['File size',(f.size/1024/1024).toFixed(3)+' MB'],['Last modified',new Date(f.lastModified).toLocaleString('en-US')]].map(a=>a));state('metadata','Done');$('reportOut').textContent='Image is ready. Select Analyze Entire Image.';}catch(e){msg('Unable to open image: '+e.message)}finally{URL.revokeObjectURL(url)}}
+let drag=null;function pointerCoords(e){let rect=$('preview').getBoundingClientRect();return{x:Math.max(0,Math.min($('preview').width,(e.clientX-rect.left)*$('preview').width/rect.width)),y:Math.max(0,Math.min($('preview').height,(e.clientY-rect.top)*$('preview').height/rect.height))}}$('preview').addEventListener('pointerdown',e=>{if(!data.img)return;drag=pointerCoords(e);$('preview').setPointerCapture(e.pointerId)});$('preview').addEventListener('pointerup',e=>{if(!drag)return;let p=pointerCoords(e);let x=Math.min(p.x,drag.x),y=Math.min(p.y,drag.y),w=Math.abs(p.x-drag.x),h=Math.abs(p.y-drag.y);data.box=w>5&&h>5?{x,y,w,h}:null;drag=null;drawPreview();$('area').disabled=!data.box;$('selection').textContent=data.box?'Selected region: '+Math.round(w)+' × '+Math.round(h)+' pixels':''});$('preview').ondblclick=()=>{data.box=null;drawPreview();$('area').disabled=true;$('selection').textContent=''};
+function getPixels(area=false){let c=data.sourceCanvas;if(!c)throw Error('No image loaded');let g=c.getContext('2d',{willReadFrequently:true});if(area&&data.box){let b=data.box,x=Math.floor(b.x),y=Math.floor(b.y),w=Math.max(1,Math.min(c.width-x,Math.round(b.w))),h=Math.max(1,Math.min(c.height-y,Math.round(b.h)));return{image:g.getImageData(x,y,w,h),w,h}}return{image:g.getImageData(0,0,c.width,c.height),w:c.width,h:c.height}}
+const dist=(a,b)=>{let dr=a[0]-b[0],dg=a[1]-b[1],db=a[2]-b[2];return dr*dr+dg*dg+db*db};const hex=a=>'#'+a.map(z=>Math.min(255,Math.max(0,Math.round(z))).toString(16).padStart(2,'0')).join('').toUpperCase();
+function colorName(rgb){let[r,g,b]=rgb;let max=Math.max(r,g,b),min=Math.min(r,g,b),d=max-min;if(max<42)return 'Black / very dark';if(min>225&&d<27)return 'White';if(d<20)return max>175?'Light gray':max>90?'Gray':'Dark gray';let h=0;if(max===r)h=((g-b)/d+6)%6;else if(max===g)h=(b-r)/d+2;else h=(r-g)/d+4;h*=60;if(h<15||h>=345)return 'Red';if(h<45)return 'Orange';if(h<72)return 'Yellow';if(h<165)return 'Green';if(h<200)return 'Turquoise';if(h<255)return 'Blue';if(h<290)return 'Purple';return 'Pink / magenta'}
+function colorsAndStats(pix,k){let p=pix.image.data,step=Math.max(1,Math.floor((p.length/4)/85000));let points=[],hist=[new Uint32Array(256),new Uint32Array(256),new Uint32Array(256)];let sum=0,sum2=0,dark=0,bright=0,sat=0;for(let j=0;j<p.length;j+=4*step){let a=p[j+3]/255,r=Math.round(p[j]*a+255*(1-a)),g=Math.round(p[j+1]*a+255*(1-a)),b=Math.round(p[j+2]*a+255*(1-a));points.push([r,g,b]);hist[0][r]++;hist[1][g]++;hist[2][b]++;let l=.2126*r+.7152*g+.0722*b;sum+=l;sum2+=l*l;if(l<52)dark++;if(l>215)bright++;sat+=Math.max(r,g,b)-Math.min(r,g,b)}let n=points.length;let means=Array.from({length:k},(_,j)=>points[Math.floor((j+.5)*n/k)]?.slice()||[0,0,0]);let groups=new Uint32Array(k);for(let iteration=0;iteration<12;iteration++){let buckets=Array.from({length:k},()=>[0,0,0,0]);for(let p of points){let idx=0,best=Infinity;for(let z=0;z<k;z++){let v=dist(p,means[z]);if(v<best){best=v;idx=z}}let b=buckets[idx];b[0]+=p[0];b[1]+=p[1];b[2]+=p[2];b[3]++}for(let z=0;z<k;z++)if(buckets[z][3])means[z]=buckets[z].slice(0,3).map(v=>v/buckets[z][3])}groups.fill(0);for(let p of points){let idx=0,best=Infinity;for(let z=0;z<k;z++){let v=dist(p,means[z]);if(v<best){best=v;idx=z}}groups[idx]++}let colors=means.map((c,i)=>({rgb:c,hex:hex(c),name:colorName(c),count:groups[i],percent:groups[i]*100/n})).sort((a,b)=>b.count-a.count);let lum=sum/n,stdev=Math.sqrt(Math.max(0,sum2/n-lum*lum));return{colors,hist:hist.map(a=>Array.from(a)),stats:{brightness:lum,contrast:stdev,dark:dark*100/n,bright:bright*100/n,saturation:sat/n},points:n}}
+function drawHistogram(hist){let canvas=$('hist'),ctx=canvas.getContext('2d');ctx.clearRect(0,0,canvas.width,canvas.height);ctx.fillStyle='#fafcfd';ctx.fillRect(0,0,canvas.width,canvas.height);let top=Math.max(...hist.flat())||1;ctx.strokeStyle='#dce6ee';for(let y=0;y<=4;y++){ctx.beginPath();ctx.moveTo(30,10+y*47);ctx.lineTo(780,10+y*47);ctx.stroke()}['#dc4444','#3f985a','#3c6fd0'].forEach((color,i)=>{ctx.strokeStyle=color;ctx.lineWidth=1.5;ctx.beginPath();for(let j=0;j<256;j++){let x=30+j*740/255,y=204-hist[i][j]/top*190;j?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke()});ctx.fillStyle='#345';ctx.font='12px sans-serif';ctx.fillText('0',30,217);ctx.fillText('128',395,217);ctx.fillText('255',758,217)}
+function estimateSharpness(pix){let{data:p}=pix.image,{w,h}=pix;if(w<4||h<4)return 0;let step=Math.max(1,Math.floor(Math.sqrt(w*h/35000))),sm=0,sm2=0,n=0;function gray(idx){return .299*p[idx]+.587*p[idx+1]+.114*p[idx+2]}for(let y=1;y<h-1;y+=step)for(let x=1;x<w-1;x+=step){let j=(y*w+x)*4,v=4*gray(j)-gray(j-4)-gray(j+4)-gray(j-w*4)-gray(j+w*4);sm+=v;sm2+=v*v;n++}return Math.max(0,sm2/n-(sm/n)**2)}
+function showColors(out){data.colors=out.colors;data.hist=out.hist;data.quality={...out.stats,sharpness:estimateSharpness(getPixels())};$('colorbar').innerHTML=out.colors.map(c=>'<span title="'+c.hex+'" style="background:'+c.hex+';width:'+c.percent+'%"></span>').join('');$('colorsTable').innerHTML=tab(['Color','Approximate name','HEX code','Share'],out.colors.map(c=>['<span class="swatch" style="background:'+c.hex+'"></span>',esc(c.name),'<code>'+c.hex+'</code>',c.percent.toFixed(2)+'%']));drawHistogram(out.hist);state('colors','Calculated '+out.points.toLocaleString('en-US')+' samples');state('spectrum','Done');$('qualityOut').innerHTML=Object.entries({Brightness:data.quality.brightness.toFixed(1)+' / 255', 'Brightness contrast':data.quality.contrast.toFixed(1),'Dark pixels':data.quality.dark.toFixed(1)+'%','Bright pixels':data.quality.bright.toFixed(1)+'%','Average channel spread':data.quality.saturation.toFixed(1),'Approximate sharpness index':data.quality.sharpness.toFixed(1)}).map(([k,v])=>'<div class="stat">'+esc(k)+'<b>'+esc(v)+'</b></div>').join('');state('quality','Done')} 
+function geometry(){let w=data.img.naturalWidth,h=data.img.naturalHeight;data.geometry={width:w,height:h,aspect:w/h,megapixels:w*h/1e6};$('geometryOut').innerHTML='<div class="grid">'+[['Width',w+' px'],['Height',h+' px'],['Aspect ratio',(w/h).toFixed(3)+' : 1'],['Resolution',(w*h/1e6).toFixed(3)+' MP']].map(([k,v])=>'<div class="stat">'+k+'<b>'+v+'</b></div>').join('')+'</div>';state('geometry','Done')}
+async function run(area=false){if(!data.img)return;let b=area?$('area'):$('analyze');b.disabled=true;try{msg('Analyzing pixel colors…',10);await sleep();let p=getPixels(area),k=Math.min(20,Math.max(2,parseInt($('clusters').value)||8));let out=colorsAndStats(p,k);msg('Drawing charts and image metrics…',70);await sleep();showColors(out);geometry();if(area)state('colors','Selected region analyzed');msg('Local analysis completed. Optional AI tools can also run separately.',100);updateReport()}catch(e){msg('Analysis error: '+e.message,0)}finally{b.disabled=false}}$('area').onclick=()=>run(true);
+
+// === Enhanced hybrid image interpretation / OCR (version 1.1) ===
+function resetLocalPanels(){
+ for(const id of ['colorsTable','geometryOut','qualityOut','reportOut','metaOut'])$(id).textContent='Waiting for image analysis.';
+ $('colorbar').innerHTML='';$('hist').getContext('2d').clearRect(0,0,790,220);
+ for(const id of ['colors','spectrum','geometry','quality','metadata'])state(id,'Waiting for image');
+}
+function resetAIPanels(){
+  const init={text:'Waiting for OCR',numbers:'Waiting for OCR',people:'Waiting for detection',objects:'Waiting for detection',description:'Waiting for classification'};
+  for(const [k,v] of Object.entries(init))state(k,v);
+  $('ocrTable').innerHTML='No text has been recognized yet.';
+  $('numbersOut').textContent='No numbers or languages have been extracted yet.';
+  $('peopleOut').textContent='Waiting for people detection.';
+  $('objectsOut').textContent='Waiting for object detection.';
+  $('descOut').textContent='Waiting for detection and classification results.';
+  $('classOut').textContent='Waiting for image classification.';
+  $('copytext').disabled=true;
+}
+$('showboxes').onchange=drawPreview;
+
+// A network indicator does not guarantee a given host/model is available.
+async function checkOnline(){
+  const online=navigator.onLine;
+  data.online=online;
+  const e=$('connection');e.className='status '+(online?'':'warn');
+  e.textContent=online?'● Network is available — model downloads are verified during analysis':'● Network unavailable — local analysis still works';
+  return online;
+}
+$('check').onclick=checkOnline;
+window.addEventListener('online',checkOnline);
+window.addEventListener('offline',checkOnline);
+checkOnline();
+function permission(){
+ if($('mode').value==='offline')throw Error('Local-only mode is selected.');
+ if(!$('consent').checked)throw Error('Enable consent to download and run the AI models.');
+ // Already loaded libraries/models may still work if the network disappears.
+ if(!navigator.onLine && !window.Tesseract && !window.cocoSsd)throw Error('Internet access is unavailable for the initial model download.');
+}
+async function script(url){
+ return new Promise((resolve,reject)=>{
+  const tag=document.createElement('script');tag.src=url;tag.async=true;
+  const timer=setTimeout(()=>{tag.remove();reject(Error('Library download timed out: '+url))},35000);
+  tag.onload=()=>{clearTimeout(timer);resolve()};
+  tag.onerror=()=>{clearTimeout(timer);tag.remove();reject(Error('Cannot reach '+url))};
+  document.head.appendChild(tag);
+ });
+}
+async function loadLibrary(test,urls,description){
+ if(test())return;
+ const failures=[];
+ for(let u of urls){
+  try{await script(u);if(test())return;}catch(e){failures.push(e.message)}
+ }
+ throw Error('Failed to load '+description+'. '+failures.join(' ; '));
+}
+function guessLanguage(token,fullLine=''){
+ if(/^[0-9٠-٩۰-۹.,٫+−-]+$/u.test(token))return 'Number (no language)';
+ if(/[\u067E\u0686\u0698\u06AF\u06A9\u06CC\u06C0\u06C1]/u.test(token))return 'Possibly Persian';
+ if(/[\u0600-\u06FF]/u.test(token)){
+  if(/[\u067E\u0686\u0698\u06AF\u06A9\u06CC]/u.test(fullLine))return 'Possibly Persian (line context)';
+  return 'Arabic or Persian (uncertain)';
+ }
+ if(/[ÅÄÖåäö]/u.test(token))return 'Possibly Finnish or Swedish';
+ if(/[A-Za-z]/u.test(token))return 'Latin-script language (context needed)';
+ return 'Unknown';
+}
+let worker=null,workerLanguages='';
+async function ocr(){
+ if(!data.img)return false;
+ const button=$('ocr');button.disabled=true;
+ try{
+  permission();
+  msg('Preparing OCR library and language files…',12);
+  await loadLibrary(()=>!!window.Tesseract,[
+   'https://cdn.jsdelivr.net/npm/tesseract.js@5.1.1/dist/tesseract.min.js',
+   'https://unpkg.com/tesseract.js@5.1.1/dist/tesseract.min.js'
+  ],'Tesseract.js');
+  const langs=$('langs').value;
+  if(worker&&workerLanguages!==langs){await worker.terminate();worker=null;}
+  if(!worker){
+   worker=await Tesseract.createWorker(langs.split('+'),1,{logger:m=>{
+    if(typeof m.progress==='number')msg('Reading text: '+(m.status||'')+' '+Math.round(m.progress*100)+'%',Math.max(12,Math.round(m.progress*100)));
+   }});
+   workerLanguages=langs;
+  }
+  // Use a higher resolution than the color-analysis canvas where practical.
+  const input=canvasFromImage(data.img,2600);
+  const result=await worker.recognize(input);
+  const raw=(result?.data?.text||'').trim();
+  const entries=[];
+  for(const line of raw.split(/\n+/)){
+   const words=line.match(/[\p{L}\p{M}\u200c\u200d]+(?:['’ـ-][\p{L}\p{M}\u200c\u200d]+)*|[0-9٠-٩۰-۹]+(?:[.,٫][0-9٠-٩۰-۹]+)*/gu)||[];
+   for(const word of words)entries.push({word,type:/^[0-9٠-٩۰-۹]/.test(word)?'Number':'Word',lang:guessLanguage(word,line)});
+  }
+  data.ocr={text:raw,words:entries,languageModels:langs.split('+'),confidence:result?.data?.confidence??null};
+  data.numbers=entries.filter(x=>x.type==='Number').map(x=>x.word);
+  $('ocrTable').innerHTML=entries.length?tab(['Word or number','Type','Possible language'],entries.map(x=>[esc(x.word),esc(x.type),esc(x.lang)])):'OCR did not find clearly readable words in this image.';
+  $('numbersOut').innerHTML='<b>Extracted numbers:</b> '+(data.numbers.length?data.numbers.map(esc).join(', '):'No confirmed numbers')+'<p><b>Selected models:</b> '+esc(langs.replaceAll('+',' + '))+'</p><p class="small">Arabic and Persian share letters; identifying a language from a short word may not be reliable.</p>';
+  state('text','OCR complete — '+entries.length+' entries');state('numbers','Done');$('copytext').disabled=!raw;
+  msg('Text recognition completed',100);updateReport();return true;
+ }catch(e){
+  state('text','OCR failed');state('numbers','No results available');$('ocrTable').innerHTML='<p class="errorline">'+esc(e.message)+'</p>';
+  $('numbersOut').textContent='OCR failed; no assumed numbers will be shown.';
+  msg('OCR failed: '+e.message,0);return false;
+ }finally{button.disabled=false}
+}
+$('ocr').onclick=ocr;
+$('copytext').onclick=()=>navigator.clipboard?.writeText(data.ocr?.text||'');
+const clsEnglish={};
+let detector=null,sceneModel=null;
+async function loadTF(){
+ await loadLibrary(()=>!!window.tf,[
+ 'https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.22.0/dist/tf.min.js',
+ 'https://unpkg.com/@tensorflow/tfjs@4.22.0/dist/tf.min.js'
+ ],'TensorFlow.js');
+ try{await tf.ready()}catch(e){}
+}
+function normalizeBox(pred){
+ if(Array.isArray(pred.bbox)){let [x,y,w,h]=pred.bbox;return{xmin:x,ymin:y,xmax:x+w,ymax:y+h}}
+ if(pred.box){let b=pred.box;return{xmin:b.xmin,ymin:b.ymin,xmax:b.xmax,ymax:b.ymax}}
+ return null;
+}
+function buildDescription(){
+ const counts={};for(const z of (data.objects||[])){let k=z.label;counts[k]=(counts[k]||0)+1}
+ const chunks=[];
+ if(data.objects){
+  chunks.push(Object.keys(counts).length?'Objects detected: '+Object.entries(counts).map(([key,n])=>n+' × '+(clsEnglish[key.replaceAll(' ','_')]||key)).join(', ')+'.':'No recognized object exceeded the selected confidence threshold; this does not mean the image is empty.');
+ }
+ if(data.classification?.length){let c=data.classification[0];chunks.push('Most likely MobileNet image category: '+c.className+' ('+(c.probability*100).toFixed(1)+'%).');}
+ if(!chunks.length)chunks.push('Insufficient model results to generate a summary.');
+ chunks.push('Note: These probabilistic estimates cover limited model categories, not a complete semantic description of every image detail.');
+ data.description=chunks.join(' ');$('descOut').textContent=data.description;state('description','Updated from AI models');
+}
+async function detect(){
+ if(!data.img)return false;
+ let button=$('detect');button.disabled=true;
+ let detectionOK=false,classificationOK=false,errors=[];
+ try{
+  permission();msg('Initializing TensorFlow.js vision engine…',15);
+  await loadTF();
+  try{
+   await loadLibrary(()=>!!window.cocoSsd,[
+    'https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js',
+    'https://unpkg.com/@tensorflow-models/coco-ssd@2.2.3/dist/coco-ssd.min.js'
+   ],'COCO-SSD');
+   if(!detector){msg('Downloading object detection model…',24);detector=await cocoSsd.load({base:'lite_mobilenet_v2'});}
+   msg('Detecting people and objects…',55);
+   const predictions=await detector.detect(data.sourceCanvas,100,Number($('threshold').value));
+   data.objects=predictions.filter(p=>p.score>=Number($('threshold').value)).map(p=>({label:p.class||p.label,score:p.score,box:normalizeBox(p)}));
+   $('objectsOut').innerHTML=data.objects.length?tab(['Detected object','Confidence','Position in analysis image (px)'],data.objects.map(p=>[
+    esc(clsEnglish[p.label.replaceAll(' ','_')]||p.label),Number(p.score*100).toFixed(1)+'%',esc(p.box?`(${p.box.xmin.toFixed(0)}, ${p.box.ymin.toFixed(0)}) — ${Math.round(p.box.xmax-p.box.xmin)}×${Math.round(p.box.ymax-p.box.ymin)}`:'—')
+   ])):'No known objects detected above the threshold. Try a 25% threshold.';
+   const people=data.objects.filter(p=>p.label==='person');
+   $('peopleOut').textContent='Detected people: '+people.length+' — estimated from bounding boxes; not a determination of identity or gender.';
+   state('people','Done');state('objects','Done — '+data.objects.length+' objects');detectionOK=true;
+   drawPreview();
+  }catch(e){
+   errors.push('Object detection: '+e.message);state('objects','Detection failed');state('people','Not run');
+   $('objectsOut').innerHTML='<p class="errorline">'+esc(e.message)+'</p>';
+   $('peopleOut').textContent='No reliable people count is available.';
+  }
+  try{
+   await loadLibrary(()=>!!window.mobilenet,[
+    'https://cdn.jsdelivr.net/npm/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js',
+    'https://unpkg.com/@tensorflow-models/mobilenet@2.1.1/dist/mobilenet.min.js'
+   ],'MobileNet');
+   if(!sceneModel){msg('Downloading general image classification model…',70);sceneModel=await mobilenet.load({version:2,alpha:0.5});}
+   data.classification=await sceneModel.classify(data.sourceCanvas,3);
+   $('classOut').innerHTML=tab(['Model class','Model confidence'],data.classification.map(p=>[esc(p.className),Number(p.probability*100).toFixed(1)+'%']));
+   classificationOK=true;
+  }catch(e){errors.push('General classification: '+e.message);$('classOut').innerHTML='<p class="errorline">'+esc(e.message)+'</p>';}
+  buildDescription();updateReport();
+  msg(errors.length?'Image recognition partially completed: '+errors.join(' ; '):'Object detection and image classification completed',errors.length?70:100);
+  return detectionOK||classificationOK;
+ }catch(e){
+  state('objects','Model loading failed');state('people','Not run');
+  $('objectsOut').innerHTML='<p class="errorline">'+esc(e.message)+'</p>';
+  $('classOut').textContent='General image classification could not run.';
+  msg('Vision engine failed: '+e.message,0);return false;
+ }finally{button.disabled=false;}
+}
+$('detect').onclick=detect;
+let fullRunning=false;
+async function fullAnalyze(){
+ if(!data.img||fullRunning)return;
+ fullRunning=true;$('analyze').disabled=true;
+ try{
+  msg('Step 1/3: Local color and quality analysis…',4);
+  await run(false);
+  if($('mode').value==='offline'){
+   msg('Local analysis complete. Model downloads are disabled in local-only mode.',100);
+   return;
+  }
+  if(!$('consent').checked){
+   const alertText='Color analysis is complete. To enable OCR and object detection, consent to AI model downloads and run the analysis again.';
+   $('ocrTable').textContent=alertText;$('objectsOut').textContent=alertText;
+   state('text','Not run — consent required');state('objects','Not run — consent required');
+   msg(alertText,100);return;
+  }
+  msg('Step 2/3: Reading text and numbers, including Arabic and Persian…',32);
+  const textOK=await ocr();
+  msg('Step 3/3: Detecting people, objects, and image category…',65);
+  const visionOK=await detect();
+  const title=textOK&&visionOK?'Local and AI analysis completed.':textOK||visionOK?'Local analysis completed; some AI modules succeeded.':'Only color analysis completed. Recognition models failed; see individual section errors.';
+  msg(title,textOK&&visionOK?100:80);updateReport();
+ }finally{fullRunning=false;$('analyze').disabled=false;}
+}
+$('analyze').onclick=fullAnalyze;
+
+function report(){return ['The Magic Eye for Image Analysis','File: '+(data.file?.name||'None'),'Dimensions: '+(data.img?data.img.naturalWidth+' × '+data.img.naturalHeight:'—'),'Dominant colors:',...data.colors.map(c=>c.name+' | '+c.hex+' | '+c.percent.toFixed(2)+'%'),'Brightness index: '+(data.quality?.brightness.toFixed(1)??'Unavailable'),'Contrast index: '+(data.quality?.contrast.toFixed(1)??'Unavailable'),'Recognized text: '+(data.ocr?.text||'Not analyzed'),'Numbers: '+(data.numbers?.join(', ')||'Not analyzed'),'Objects: '+(data.objects?data.objects.map(x=>x.label).join(', '):'Not analyzed'),'General classification: '+(data.classification?.map(p=>p.className+' '+(p.probability*100).toFixed(1)+'%').join(', ')||'Unavailable'),'Description: '+(data.description||'Unavailable')].join('\n')}function updateReport(){$('reportOut').textContent=report()}$('print').onclick=()=>window.print();$('copy').onclick=async()=>{try{await navigator.clipboard.writeText(report());msg('Report copied',100)}catch(e){msg('Clipboard access is unavailable in this environment')}};function download(name,mime,str){let blob=new Blob([str],{type:mime});let a=document.createElement('a'),url=URL.createObjectURL(blob);a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),10000)}$('json').onclick=()=>download('magic-eye-report.json','application/json;charset=utf-8',JSON.stringify({filename:data.file?.name,width:data.img?.naturalWidth,height:data.img?.naturalHeight,colors:data.colors,quality:data.quality,geometry:data.geometry,ocr:data.ocr,numbers:data.numbers,objects:data.objects,classification:data.classification,description:data.description},null,2));$('csv').onclick=()=>download('magic-eye-colors.csv','text/csv;charset=utf-8','\ufeffColor,HEX,Percentage\r\n'+data.colors.map(x=>[x.name,x.hex,x.percent.toFixed(3)].map(v=>'"'+String(v).replaceAll('"','""')+'"').join(',')).join('\r\n'));
+$('reset').onclick=()=>{data.img=null;data.file=null;data.sourceCanvas=null;data.box=null;data.colors=[];data.hist=null;data.quality=null;data.geometry=null;data.ocr=null;data.numbers=null;data.objects=null;data.description=null;data.classification=null;$('file').value='';resetAIPanels();drawPreview();$('analyze').disabled=true;$('ocr').disabled=true;$('detect').disabled=true;$('area').disabled=true;$('copytext').disabled=true;for(let id of ['colorsTable','ocrTable','numbersOut','peopleOut','objectsOut','descOut','classOut','geometryOut','qualityOut','metaOut','reportOut','selection'])$(id).textContent='Waiting for a new image';$('colorbar').innerHTML='';$('hist').getContext('2d').clearRect(0,0,790,220);for(let id of ['colors','spectrum','text','numbers','people','objects','description','geometry','quality','metadata'])state(id,'Waiting for image');msg('Upload an image to begin.',0)};
+$('jump').innerHTML=[['colors','Colors'],['spectrum','RGB'],['text','Text'],['numbers','Numbers and languages'],['people','People'],['objects','Objects'],['description','Description'],['geometry','Geometry'],['quality','Quality'],['metadata','File data'],['report','Report']].map(([id,label])=>'<a href="#'+id+'">'+label+'</a>').join('');
+
+// Three accessible native tutorials (English, Persian, Finnish) with Escape and backdrop support.
+[['helpDialog','helpOpen','helpClose'],['arabicDialog','arabicOpen','arabicClose'],['persianDialog','persianOpen','persianClose'],['finnishDialog','finnishOpen','finnishClose']].forEach(([dialogId,openId,closeId])=>{
+  const dialog=$(dialogId),openButton=$(openId),closeButton=$(closeId);
+  openButton.addEventListener('click',()=>{
+    if(!dialog.open){dialog.showModal();dialog.scrollTop=0;closeButton.focus();}
+  });
+  closeButton.addEventListener('click',()=>dialog.close());
+  dialog.addEventListener('click',event=>{if(event.target===dialog)dialog.close();});
+  dialog.addEventListener('close',()=>openButton.focus());
+});
+</script></body></html>
